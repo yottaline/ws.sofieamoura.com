@@ -7,6 +7,8 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
+use App\Models\Retailer;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class LoginRequest extends FormRequest
@@ -27,7 +29,7 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
+            'mobile' => ['required'],
             'password' => ['required', 'string'],
         ];
     }
@@ -41,15 +43,32 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
+        $retailer = Retailer::where('retailer_phone',request('mobile'))->first();
 
+        if(!$retailer)
+        {
+            RateLimiter::hit($this->throttleKey());
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
-            ]);
+                'mobile' => 'You do not have an account']);
+        }
+        else{
+            $password = Hash::check(request('password'), $retailer->retailer_password);
+            if(!$password){
+                RateLimiter::hit($this->throttleKey());
+                throw ValidationException::withMessages([
+                    'password' => 'The password is incorrect',]);
+            }else{
+                if(!$retailer->retailer_approved){
+                    RateLimiter::clear($this->throttleKey());
+                    Auth::login($retailer);
+                }else{
+                    RateLimiter::hit($this->throttleKey());
+                throw ValidationException::withMessages([
+                    'approved' => 'Your store is not activated. Please contact technical support']);
+                }
+            }
         }
 
-        RateLimiter::clear($this->throttleKey());
     }
 
     /**
