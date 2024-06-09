@@ -43,11 +43,4 @@ class Location extends Model
 
         return $id ? $locations->first() : $locations->get();
     }
-
-    public static function submit($param, $id)
-    {
-        if($id) return self::where('location_id', $id)->update($param) ? $id : false;
-        $status = self::create($param);
-        return $status ? $status->id : false;
-    }
 }
