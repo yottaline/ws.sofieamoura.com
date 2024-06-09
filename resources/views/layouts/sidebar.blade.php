@@ -8,7 +8,7 @@
      <div class="offcanvas-body">
          <ul class="list-group list-group-flush">
              <li class="list-group-item nav-dashboard">
-                 <a class="link-dark d-block" href="/">
+                 <a class="link-dark d-block" href="/dashboard">
                      <i class="bi bi-speedometer text-secondary me-2"></i><b>Dashboard</b>
                  </a>
              </li>

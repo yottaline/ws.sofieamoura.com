@@ -25,10 +25,12 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function(){
     // settings route
     Route::get('settings', 'LocationController@index');
-    Route::prefix('locations')->group(function(){
-        Route::post('load', 'LocationController@load');
-    });
+
 });
+Route::prefix('locations')->group(function(){
+    Route::post('load', 'LocationController@load');
+});
+Route::post('register_retailer', 'RetailerController@submit');
 
 // Route::middleware('auth')->group(function () {
 //     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
