@@ -26,6 +26,8 @@ Route::middleware('auth')->group(function(){
     // settings route
     Route::get('settings', 'LocationController@index');
 
+
+    Route::get('profile', 'ProfileController@edit');
 });
 Route::prefix('locations')->group(function(){
     Route::post('load', 'LocationController@load');

@@ -27,7 +27,7 @@
          </ul>
      </div>
      <div class="d-flex">
-         <a href="" class="d-block p-3 flex-grow-1 border-top rounded-0 link-dark">
+         <a href="/profile/" class="d-block p-3 flex-grow-1 border-top rounded-0 link-dark">
              <i class="bi bi-person-circle text-warning me-2"></i>
              <b>{{ auth()->user()->name }}</b>
          </a>
