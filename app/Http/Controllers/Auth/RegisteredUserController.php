@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Retailer;
 use App\Providers\RouteServiceProvider;
+use Carbon\Carbon;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -33,7 +34,7 @@ class RegisteredUserController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'password' => ['required',],
         ]);
 
         $id    = $request->retailer_id;
@@ -65,6 +66,7 @@ class RegisteredUserController extends Controller
             'retailer_city'         => $request->city,
             'retailer_address'      => $request->address,
             'retailer_currency'     => 1,
+            'retailer_created'      => Carbon::now()
         ];
 
         $result = Retailer::submit($param, $id);
