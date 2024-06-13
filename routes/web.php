@@ -26,6 +26,9 @@ Route::middleware('auth')->group(function(){
     // settings route
     Route::get('settings', 'LocationController@index');
 
+    Route::prefix('ws_products')->group(function(){
+        Route::get('/', 'WsProductController@index');
+    });
 
     Route::get('profile', 'ProfileController@edit');
     Route::put('update', 'ProfileController@update');
