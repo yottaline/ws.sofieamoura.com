@@ -9,10 +9,10 @@
             <div class="col-12 col-sm-8 col-lg-9">
                 <div class="card card-box">
                     <div class="card-body">
-                        <h3 class="text-body-tertiary">#<% retailer.retailer_code %></h3>
+                        <h3 class="text-body-tertiary">#<% retailer[0].retailer_code %></h3>
                         <hr>
                         {{-- start form data --}}
-                        <form method="POST" id="wProductF" action="/ws_products/submit">
+                        <form method="POST" id="wProductF" action="/update">
                             @csrf
                             <input type="hidden" name="_method" value="put">
                             <input type="hidden" name="id" id="product_id" ng-value="retailer.retailer_id">
@@ -24,7 +24,7 @@
                                                 <label for="name">
                                                     Name <b class="text-danger">&ast;</b></label>
                                                 <input type="text" class="form-control" name="name"
-                                                    ng-value="retailer.retailer_fullName" id="name" />
+                                                    ng-value="retailer[0].retailer_fullName" id="name" />
                                             </div>
                                         </div>
 
@@ -33,7 +33,7 @@
                                                 <label for="email">
                                                     Email <b class="text-danger">&ast;</b></label>
                                                 <input type="email" class="form-control" name="email"
-                                                    ng-value="retailer.retailer_email" id="email" />
+                                                    ng-value="retailer[0].retailer_email" id="email" />
                                             </div>
                                         </div>
 
@@ -42,7 +42,7 @@
                                                 <label for="phone">
                                                     Phone <b class="text-danger">&ast;</b></label>
                                                 <input type="text" class="form-control" name="phone"
-                                                    ng-value="retailer.retailer_phone" id="phone" />
+                                                    ng-value="retailer[0].retailer_phone" id="phone" />
                                             </div>
                                         </div>
 
@@ -50,7 +50,7 @@
                                             <div class="mb-3">
                                                 <label for="password">
                                                     Password <b class="text-danger">&ast;</b></label>
-                                                <input type="password" class="form-control" name="password" value="+****"
+                                                <input type="password" class="form-control" name="password"
                                                     id="password" />
                                             </div>
                                         </div>
@@ -60,7 +60,7 @@
                                                 <label for="company">
                                                     Company Name <b class="text-danger">&ast;</b></label>
                                                 <input type="text" class="form-control" name="company"
-                                                    ng-value="retailer.retailer_company" id="company" />
+                                                    ng-value="retailer[0].retailer_company" id="company" />
                                             </div>
                                         </div>
 
@@ -69,7 +69,7 @@
                                                 <label for="website">
                                                     Company Website <b class="text-danger">&ast;</b></label>
                                                 <input type="text" class="form-control" name="website"
-                                                    ng-value="retailer.retailer_website" id="website" />
+                                                    ng-value="retailer[0].retailer_website" id="website" />
                                             </div>
                                         </div>
 
@@ -86,7 +86,7 @@
                                                 <label for="payment">
                                                     Advance payment <b class="text-danger">&ast;</b></label>
                                                 <input type="text" class="form-control" name="payment"
-                                                    ng-value="retailer.retailer_adv_payment" id="payment" />
+                                                    ng-value="retailer[0].retailer_adv_payment" id="payment" />
                                             </div>
                                         </div>
 
@@ -94,7 +94,7 @@
                                             <div class="mb-3">
                                                 <label for="desc">
                                                     Descaption <b class="text-danger">&ast;</b></label>
-                                                <textarea name="desc" class="form-control" id="desc" cols="30" rows="10"><%retailer.retailer_desc%></textarea>
+                                                <textarea name="desc" class="form-control" id="desc" cols="30" rows="10"><%retailer[0].retailer_desc%></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -105,8 +105,12 @@
                                             <div class="mb-3">
                                                 <label for="currency">
                                                     currency <b class="text-danger">&ast;</b></label>
-                                                <input type="text" class="form-control" name="currency"
-                                                    ng-value="retailer.retailer_currency" id="currency" />
+                                                <select name="currency" id="currency" class="form-select" required>
+                                                    <option value="default">-- SELECT YOUR CURRENCY --</option>
+                                                    <option ng-repeat="currency in currencies"
+                                                        ng-value="currency.currency_id" ng-bind="currency.currency_name">
+                                                    </option>
+                                                </select>
                                             </div>
                                         </div>
 
@@ -114,8 +118,12 @@
                                             <div class="mb-3">
                                                 <label for="country">
                                                     country <b class="text-danger">&ast;</b></label>
-                                                <input type="text" class="form-control" name="country"
-                                                    ng-value="retailer.retailer_country" id="country" />
+                                                <select name="country" id="country" class="form-select" required>
+                                                    <option value="default">-- SELECT YOUR COUNTRY --</option>
+                                                    <option ng-repeat="country in countries"
+                                                        ng-value="country.location_id" ng-bind="country.location_name">
+                                                    </option>
+                                                </select>
                                             </div>
                                         </div>
 
@@ -124,7 +132,16 @@
                                                 <label for="province">
                                                     Province <b class="text-danger">&ast;</b></label>
                                                 <input type="text" class="form-control" name="province"
-                                                    ng-value="retailer.retailer_province" id="province" />
+                                                    ng-value="retailer[0].retailer_province" id="province" />
+                                            </div>
+                                        </div>
+
+                                        <div class="col-6">
+                                            <div class="mb-3">
+                                                <label for="zipCode">
+                                                    City zip code <b class="text-danger">&ast;</b></label>
+                                                <input type="text" class="form-control" name="zip"
+                                                    ng-value="retailer[0].address_zip" id="zipCode" />
                                             </div>
                                         </div>
 
@@ -132,15 +149,7 @@
                                             <div class="mb-3">
                                                 <label for="city">City <b class="text-danger">&ast;</b></label>
                                                 <input type="text" class="form-control" name="city"
-                                                    ng-value="retailer.retailer_city" id="city" />
-                                            </div>
-                                        </div>
-
-                                        <div class="col-6">
-                                            <div class="mb-3">
-                                                <label for="address">Address <b class="text-danger">&ast;</b></label>
-                                                <input type="text" class="form-control" name="address"
-                                                    ng-value="retailer.retailer_address" id="address" />
+                                                    ng-value="retailer[0].retailer_city" id="city" />
                                             </div>
                                         </div>
 
@@ -148,8 +157,8 @@
                                             <div class="mb-3">
                                                 <label for="shippingAddress">Shipping Address <b
                                                         class="text-danger">&ast;</b></label>
-                                                <input type="text" class="form-control" name="shipping-address"
-                                                    ng-value="retailer.retailer_shipAdd" id="shippingAddress" />
+                                                <input type="text" class="form-control" name="shipping"
+                                                    ng-value="retailer[0].address_line1" id="shippingAddress" />
                                             </div>
                                         </div>
 
@@ -157,23 +166,45 @@
                                             <div class="mb-3">
                                                 <label for="billAddress">Bill Address <b
                                                         class="text-danger">&ast;</b></label>
-                                                <input type="text" class="form-control" name="bill-address"
-                                                    ng-value="retailer.retailer_billAdd" id="billAddress" />
+                                                <input type="text" class="form-control" name="bill"
+                                                    ng-value="retailer[0].address_line2" id="billAddress" />
                                             </div>
                                         </div>
+
+                                        <div class="col-12">
+                                            <div class="mb-3">
+                                                <label for="address">Address <b class="text-danger">&ast;</b></label>
+                                                <input type="text" class="form-control" name="address"
+                                                    ng-value="retailer[0].retailer_address" id="address" />
+                                            </div>
+                                        </div>
+
+                                        {{--
+                                        <div class="col-6">
+                                            <div class="mb-3">
+                                                <label for="streetN">
+                                                    Street number or street name</label>
+                                                <input type="text" class="form-control" name="line1"
+                                                    ng-value="retailer[0].address_line1" id="streetN" />
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="mb-3">
+                                                <label for="Anumber">
+                                                    Apartment number </label>
+                                                <input type="text" class="form-control" name="line2"
+                                                    ng-value="retailer[0].address_line2" id="Anumber" />
+                                            </div>
+                                        </div> --}}
                                     </div>
                                 </div>
 
-
-
                                 <div class="d-flex mt-2">
-                                    <div class="me-auto">
-                                    </div>
                                     <button type="submit"
                                         class="btn btn-outline-primary text-end me-auto">Update</button>
                                 </div>
                         </form>
-                        {{-- <script>
+                        <script>
                             $('#wProductF').on('submit', e => e.preventDefault()).validate({
                                 rules: {
                                     name: {
@@ -234,13 +265,8 @@
                                         if (response.status) {
                                             toastr.success('Data processed successfully');
                                             scope.$apply(() => {
-                                                if (scope.updateWProduct === false) {
-                                                    scope.siezs.unshift(response
-                                                        .data);
-                                                } else {
-                                                    scope.siezs[scope
-                                                        .updateWProduct] = response.data;
-                                                }
+                                                scope.retailer.unshift(response
+                                                    .data);
                                             });
                                         } else toastr.error(response.message);
                                     }).fail(function(jqXHR, textStatus, errorThrown) {
@@ -251,7 +277,7 @@
                                     });
                                 }
                             });
-                        </script> --}}
+                        </script>
                     </div>
                 </div>
             </div>
@@ -267,7 +293,9 @@
             });
         app.controller('ngCtrl', function($scope) {
             $scope.jsonParse = (string) => JSON.parse(string);
-            $scope.retailer = <?= json_encode($user) ?>
+            $scope.retailer = <?= json_encode($user) ?>;
+            $scope.countries = <?= json_encode($countries) ?>;
+            $scope.currencies = <?= json_encode($currencies) ?>;
 
 
             scope = $scope;

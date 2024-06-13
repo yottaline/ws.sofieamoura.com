@@ -28,11 +28,12 @@ Route::middleware('auth')->group(function(){
 
 
     Route::get('profile', 'ProfileController@edit');
+    Route::put('update', 'ProfileController@update');
 });
 Route::prefix('locations')->group(function(){
     Route::post('load', 'LocationController@load');
 });
-Route::post('register_retailer', 'RetailerController@submit');
+// Route::post('register_retailer', 'RetailerController@submit');
 
 // Route::middleware('auth')->group(function () {
 //     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
