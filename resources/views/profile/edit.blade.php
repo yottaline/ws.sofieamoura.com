@@ -4,13 +4,31 @@
     <div class="container-fluid" ng-app="ngApp" ng-controller="ngCtrl">
         <div class="row">
             <div class="col-12 col-sm-8 col-lg-3">
-
+                <div class="card card-box mb-3">
+                    <div class="card-body">
+                        <h1 style="font-size: 70px" class="text-center my-3"><i class="bi bi-person-circle text-secondary"></i>
+                        </h1>
+                        <h5 ng-if="retailer[0].retailer_code"
+                            class="text-center text-secondary font-monospace small dir-ltr mb-3"
+                            data-ng-bind="retailer[0].retailer_code"></h5>
+                        <p ng-if="data.post_title" class="fw-bold text-center m-0 small" data-ng-bind="data.post_title"></p>
+                        <hr>
+                        <p ng-if="retailer[0].retailer_fullName" class="small m-0"><i
+                                class="bi bi-person-circle text-secondary me-2"></i><span class="d-inline-block"
+                                data-ng-bind="retailer[0].retailer_fullName"></span></p>
+                        <p ng-if="retailer[0].retailer_email" class="small mt-2"><i
+                                class="bi bi-envelope-at-fill text-secondary me-2"></i><span class="d-inline-block"
+                                data-ng-bind="retailer[0].retailer_email"></span></p>
+                        <p ng-if="retailer[0].retailer_phone" class="small mt-2"><i
+                                class="bi bi-phone-vibrate-fill
+                                text-secondary me-2"></i><span
+                                class="d-inline-block" data-ng-bind="retailer[0].retailer_phone"></span></p>
+                    </div>
+                </div>
             </div>
             <div class="col-12 col-sm-8 col-lg-9">
                 <div class="card card-box">
                     <div class="card-body">
-                        <h3 class="text-body-tertiary">#<% retailer[0].retailer_code %></h3>
-                        <hr>
                         {{-- start form data --}}
                         <form method="POST" id="wProductF" action="/update">
                             @csrf
@@ -77,7 +95,8 @@
                                             <div class="mb-3">
                                                 <label for="logo">
                                                     Company Logo <b class="text-danger">&ast;</b></label>
-                                                <input type="file" class="form-control" name="logo" id="logo" />
+                                                <input type="file" class="form-control" name="logo"
+                                                    id="logo" />
                                             </div>
                                         </div>
 
