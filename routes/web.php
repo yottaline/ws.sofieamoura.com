@@ -28,6 +28,8 @@ Route::middleware('auth')->group(function(){
 
     Route::prefix('ws_products')->group(function(){
         Route::get('/', 'WsProductController@index');
+        Route::post('load', 'WsProductController@load');
+        Route::get('view/{ref}', 'WsProductController@view');
     });
 
     Route::get('profile', 'ProfileController@edit');
