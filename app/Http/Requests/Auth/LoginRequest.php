@@ -29,7 +29,7 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'mobile' => ['required'],
+            'email' => ['required'],
             'password' => ['required', 'string'],
         ];
     }
@@ -43,13 +43,13 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        $retailer = Retailer::where('retailer_phone',request('mobile'))->first();
+        $retailer = Retailer::where('retailer_email',request('email'))->first();
 
         if(!$retailer)
         {
             RateLimiter::hit($this->throttleKey());
             throw ValidationException::withMessages([
-                'mobile' => 'You do not have an account']);
+                'email' => 'You do not have an account']);
         }
         else{
             $password = Hash::check(request('password'), $retailer->retailer_password);

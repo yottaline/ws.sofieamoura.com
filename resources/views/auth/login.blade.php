@@ -23,8 +23,8 @@
                     <form id="login-form" id="loginFrom" action="#" method="post" role="form">
                         @csrf
                         <div class="mb-3 position-relative">
-                            <label for="login-mobile">Mobile<b class="text-danger">&ast;</b></label>
-                            <input id="login-mobile" name="mobile" type="text" value="{{ old('mobile') }}"
+                            <label for="login-email">Emial<b class="text-danger">&ast;</b></label>
+                            <input id="login-email" name="email" type="text" value="{{ old('email') }}"
                                 class="form-control" required>
                         </div>
                         <div class="mb-3 position-relative">
