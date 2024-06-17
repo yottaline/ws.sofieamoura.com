@@ -63,13 +63,9 @@ class ProfileController extends Controller
             'retailer_address'      => $request?->address,
             'retailer_currency'     => $request->currency,
             'retailer_adv_payment'  => $request?->payment,
-            'retailer_modified'     => Carbon::now()
+            'retailer_modified'     => Carbon::now(),
+            'retailer_password'     => Hash::make($request->password ?? '0000'),
         ];
-
-        if ($request->password) {
-            $param['retailer_password'] = Hash::make($request->password);
-        } else {
-        }
 
         $logo = $request->file('logo');
         if ($logo) {
