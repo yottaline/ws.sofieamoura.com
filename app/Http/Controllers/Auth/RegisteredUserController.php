@@ -41,21 +41,20 @@ class RegisteredUserController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email'],
-            // 'password' => ['required',],
         ]);
 
         $id    = $request->retailer_id;
         $email = $request->email;
         $phone = $request->phone;
 
-
-        if(count(Retailer::fetch(0, [['retailer_id', '!=', $id], ['retailer_phone', $phone]])))
+        // return $request;
+        if(count(Retailer::where('retailer_phone', $phone)->get()))
         {
             echo json_encode(['status' => false, 'message' => __('Phone number already exists'),]);
             return;
         }
 
-        if($email &&  count(Retailer::fetch(0, [['retailer_id', '!=', $id], ['retailer_email', $email]])))
+        if($email &&  count(Retailer::where('retailer_email', $email)->get()))
         {
             echo json_encode(['status' => false, 'message' => __('Email already exists'),]);
             return;
