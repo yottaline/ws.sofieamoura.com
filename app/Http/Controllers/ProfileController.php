@@ -29,10 +29,7 @@ class ProfileController extends Controller
         return view('profile.index', compact('retailer'));
     }
 
-    /**
-     * Update the user's profile information.
-     */
-    public function update(Request $request)
+    function update(Request $request)
     {
         return $request;
         $id    = $request->id;
@@ -63,13 +60,9 @@ class ProfileController extends Controller
             'retailer_address'      => $request?->address,
             'retailer_currency'     => $request->currency,
             'retailer_adv_payment'  => $request?->payment,
-            'retailer_modified'     => Carbon::now()
+            'retailer_modified'     => Carbon::now(),
+            'retailer_password'     => Hash::make($request->password ?? '0000'),
         ];
-
-        if ($request->password) {
-            $param['retailer_password'] = Hash::make($request->password);
-        } else {
-        }
 
         $logo = $request->file('logo');
         if ($logo) {
