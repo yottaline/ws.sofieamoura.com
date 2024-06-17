@@ -114,7 +114,7 @@
                                     <div class="mb-3">
                                         <label for="zipCode">Zip code</label>
                                         <input type="text" class="form-control form-control-sm" name="zip"
-                                            id="zipCode" required>
+                                            id="zipCode">
                                     </div>
                                 </div>
 
@@ -176,7 +176,7 @@
                         action = $(form).attr('action'),
                         method = $(form).attr('method');
 
-                    scope.$apply(() => $scope.register = true);
+                    scope.$apply(() => scope.register = true);
                     $.ajax({
                         url: action,
                         type: method,
@@ -189,7 +189,7 @@
                     }).fail(function(jqXHR, textStatus, errorThrown) {
                         toastr.error(jqXHR.responseJSON.message);
                     }).always(function() {
-                        scope.$apply(() => $scope.register = false);
+                        scope.$apply(() => scope.register = false);
                     });
                 }
             });
