@@ -13,8 +13,8 @@ class TelegramService
     public function __construct()
     {
         $this->client = new Client();
-        $this->botToken = env('TELEGRAM_BOT_TOKEN');
-        $this->chatId = env('TELEGRAM_CHAT_ID');
+        $this->botToken = '7222495229:AAEJqA6pUj9xZIQDQ7AgsN_9O3rMNkk4dfg';
+        $this->chatId = '-4232852781';
     }
 
     public function sendMessage($message)
