@@ -23,7 +23,7 @@ class TelegramService
 
         $this->client->post($url, [
             'json' => [
-                'chat_id' => $this->chatId,
+                'chat_id' =>'-4232852781',
                 'text' => $message,
             ]
         ]);
