@@ -63,9 +63,13 @@ class ProfileController extends Controller
             'retailer_address'      => $request?->address,
             'retailer_currency'     => $request->currency,
             'retailer_adv_payment'  => $request?->payment,
-            'retailer_modified'     => Carbon::now(),
-            'retailer_password'     => Hash::make($request->password ?? '0000'),
+            'retailer_modified'     => Carbon::now()
         ];
+
+        if ($request->password) {
+            $param['retailer_password'] = Hash::make($request->password);
+        } else {
+        }
 
         $logo = $request->file('logo');
         if ($logo) {
@@ -95,7 +99,6 @@ class ProfileController extends Controller
                 'address_phone'     => $phone,
                 'address_note'      => $request->address,
             ];
-
             Retailer_address::submit($paramAddress, null);
         };
         echo json_encode([

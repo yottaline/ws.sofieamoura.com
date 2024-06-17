@@ -58,13 +58,13 @@ class LoginRequest extends FormRequest
                 throw ValidationException::withMessages([
                     'password' => 'The password is incorrect',]);
             }else{
-                if(!$retailer->retailer_approved){
-                    RateLimiter::clear($this->throttleKey());
-                    Auth::login($retailer);
-                }else{
+                if($retailer->retailer_approved == null){
                     RateLimiter::hit($this->throttleKey());
                 throw ValidationException::withMessages([
-                    'approved' => 'Your store is not activated. Please contact technical support']);
+                    'approved' => 'Your account is not approved . Please contact technical support']);
+                }else{
+                    RateLimiter::clear($this->throttleKey());
+                    Auth::login($retailer);
                 }
             }
         }
