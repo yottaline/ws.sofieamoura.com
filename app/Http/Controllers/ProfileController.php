@@ -18,23 +18,18 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-    /**
-     * Display the user's profile form.
-     */
-    public function edit(Request $request)
+    function __construct()
     {
-        $retailer =  $request->user();
-        return view('profile.edit', [
-            'user' => Retailer_address::fetch(0, [['retailer_id', $retailer->retailer_id]]),
-            'countries' => Location::fetch(0, [['location_visible', 1]]),
-            'currencies' => Currency::fetch(0, [['currency_visible', 1]]),
-        ]);
+        $this->middleware('auth');
     }
 
-    /**
-     * Update the user's profile information.
-     */
-    public function update(Request $request)
+    function index()
+    {
+        $retailer = Retailer::fetch(auth()->user()->retailer_id);
+        return view('profile.index', compact('retailer'));
+    }
+
+    function update(Request $request)
     {
         return $request;
         $id    = $request->id;
@@ -42,14 +37,12 @@ class ProfileController extends Controller
         $phone = $request->phone;
 
 
-        if(count(Retailer::fetch(0, [['retailer_id', '!=', $id], ['retailer_phone', $phone]])))
-        {
+        if (count(Retailer::fetch(0, [['retailer_id', '!=', $id], ['retailer_phone', $phone]]))) {
             echo json_encode(['status' => false, 'message' => __('Phone number already exists'),]);
             return;
         }
 
-        if($email &&  count(Retailer::fetch(0, [['retailer_id', '!=', $id], ['retailer_email', $email]])))
-        {
+        if ($email &&  count(Retailer::fetch(0, [['retailer_id', '!=', $id], ['retailer_email', $email]]))) {
             echo json_encode(['status' => false, 'message' => __('Email already exists'),]);
             return;
         }
@@ -68,19 +61,17 @@ class ProfileController extends Controller
             'retailer_currency'     => $request->currency,
             'retailer_adv_payment'  => $request?->payment,
             'retailer_modified'     => Carbon::now(),
-            'retailer_password'     => Hash::make('0000')
+            'retailer_password'     => Hash::make($request->password ?? '0000'),
         ];
 
-
         $logo = $request->file('logo');
-        if($logo)
-        {
+        if ($logo) {
             $logoName = $this->uniqidReal(rand(4, 18));
             $logo->move('images/retailers/', $logoName);
             $param['retailer_logo'] = $logoName;
         }
 
-        if($id){
+        if ($id) {
             $record = Retailer::fetch($id);
             if ($logo && $record->retailer_logo) {
                 File::delete('images/retailers/' . $record->retailer_logo);
@@ -89,7 +80,7 @@ class ProfileController extends Controller
 
         $result = Retailer::submit($param, $id);
 
-        if($result){
+        if ($result) {
             $paramAddress = [
                 'address_retailer'  => $result,
                 'address_country'   => $request->currency,
@@ -107,26 +98,5 @@ class ProfileController extends Controller
             'status' => boolval($result),
             'data'   => $result ? Retailer::fetch($result) : []
         ]);
-    }
-
-    /**
-     * Delete the user's account.
-     */
-    public function destroy(Request $request): RedirectResponse
-    {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
-        ]);
-
-        $user = $request->user();
-
-        Auth::logout();
-
-        $user->delete();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return Redirect::to('/');
     }
 }

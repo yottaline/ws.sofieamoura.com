@@ -17,16 +17,17 @@ class Ws_product extends Model
 
     static function fetch($id = 0, $params = null, $limit = 24, $offset = 0, $ids = 0)
     {
-        $ws_products = self::join('seasons', 'product_season', 'season_id')
+        $products = self::join('seasons', 'product_season', 'season_id')
             ->join('categories', 'product_category', 'category_id')
             ->leftJoin('ws_products_colors', 'product_id', 'prodcolor_product')
+            ->leftJoin('ws_products_sizes', 'product_id', 'prodsize_product')
             ->leftJoin('products_media', 'prodcolor_media', 'media_id')
             ->orderBy('prodcolor_order', 'ASC')
             ->orderBy('product_id', 'ASC')
             ->limit($limit)->offset($offset)->groupBy('product_id');
 
         if (isset($params['q'])) {
-            $ws_products->where(function (Builder $query) use ($params) {
+            $products->where(function (Builder $query) use ($params) {
                 $query->where('product_code', $params['q'])
                     ->orWhere('product_ref', $params['q'])
                     ->orWhere('product_desc', 'like', "%{$params['q']}%")
@@ -37,10 +38,10 @@ class Ws_product extends Model
             unset($params['q']);
         }
 
-        if ($params) $ws_products->where($params);
-        if ($id) $ws_products->where('product_id', $id);
-        if ($ids) $ws_products->whereIn('product_id', $ids);
+        if ($params) $products->where($params);
+        if ($id) $products->where('product_id', $id);
+        if ($ids) $products->whereIn('product_id', $ids);
 
-        return ($id || $limit == 1) ? $ws_products->first() : $ws_products->get();
+        return ($id || $limit == 1) ? $products->first() : $products->get();
     }
 }
