@@ -83,7 +83,8 @@ class RegisteredUserController extends Controller
             $message .= "Name: " . $request->name . "\n";
             $message .= "Phone: " . $request->phone;
 
-            $this->telegramService->sendMessage($message);
+
+            $this->telegramService->sendMessage($message, url("https://dash.sofieamoura.com//retailers/edit_approved/{$result}"));
         }
         echo json_encode([
             'status' => boolval($request),

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Http;
 
 class TelegramService
 {
@@ -17,15 +18,18 @@ class TelegramService
         $this->chatId = '-4232852781';
     }
 
-    public function sendMessage($message)
+    public function sendMessage($message, $buttonUrl)
     {
-        $url = "https://api.telegram.org/bot{$this->botToken}/sendMessage";
-
-        $this->client->post($url, [
-            'json' => [
-                'chat_id' =>'-4232852781',
-                'text' => $message,
-            ]
+        $response = Http::post("https://api.telegram.org/bot{$this->botToken}/sendMessage", [
+            'chat_id' => '-4232852781',
+            'text' => $message,
+            'reply_markup' => json_encode([
+                'inline_keyboard' => [[
+                    ['text' => 'Accept Request', 'url' => $buttonUrl]
+                ]]
+            ])
         ]);
+
+        return $response->json();
     }
 }
