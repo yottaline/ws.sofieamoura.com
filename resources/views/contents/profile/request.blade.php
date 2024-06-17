@@ -1,4 +1,4 @@
-@extends('index')
+@extends('master')
 @section('title', 'Account Request')
 @section('content')
     <div class="container" ng-app="ngApp" ng-controller="ngCtrl">

@@ -1,4 +1,4 @@
-@extends('index')
+@extends('master')
 @section('title', 'Profile')
 @section('content')
     <div class="container-fluid" ng-app="ngApp" ng-controller="ngCtrl">

@@ -13,9 +13,16 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use App\Services\TelegramService;
 
 class RegisteredUserController extends Controller
 {
+    protected $telegramService;
+
+    public function __construct(TelegramService $telegramService)
+    {
+        $this->telegramService = $telegramService;
+    }
     /**
      * Display the registration view.
      */
@@ -34,7 +41,7 @@ class RegisteredUserController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email'],
-            'password' => ['required',],
+            // 'password' => ['required',],
         ]);
 
         $id    = $request->retailer_id;
@@ -59,7 +66,7 @@ class RegisteredUserController extends Controller
             'retailer_fullName'     => $request->name,
             'retailer_email'        => $email,
             'retailer_phone'        => $phone,
-            'retailer_password'     => Hash::make($request->password),
+            'retailer_password'     => Hash::make('0000'),
             'retailer_company'      => $request->company,
             'retailer_country'      => $request->country,
             'retailer_province'     => $request->province,
@@ -70,6 +77,14 @@ class RegisteredUserController extends Controller
         ];
 
         $result = Retailer::submit($param, $id);
+        if($result)
+        {
+            $message = "New Retailer Registered:\n";
+            $message .= "Name: " . $request->name . "\n";
+            $message .= "Phone: " . $request->phone;
+
+            $this->telegramService->sendMessage($message);
+        }
         echo json_encode([
             'status' => boolval($request),
             'data'   => $result ? Retailer::fetch($result) : []

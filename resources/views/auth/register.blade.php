@@ -230,7 +230,6 @@
                             toastr.success(
                                 "Your account has been created successfully. The account will be activated after 3 minutes"
                             );
-                            setTimeout(location.replace("./login"), 300000)
                         } else toastr.error(data.message);
                     }).fail(function(jqXHR, textStatus, errorThrown) {
                         toastr.error(jqXHR.responseJSON.message);
