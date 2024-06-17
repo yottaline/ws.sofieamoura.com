@@ -2,7 +2,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href="/favico.png" />
-    <title>@yield('title')</title>
+    <title>@yield('title') | Sofie Amoura</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -11,16 +11,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous">
     </script>
-
-
-
-
-    {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.datatables.net/2.0.1/js/dataTables.js"></script>
-    <script src="https://cdn.datatables.net/2.0.1/js/dataTables.bootstrap5.js"></script> --}}
-
-
-
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" />
 
@@ -70,73 +60,15 @@
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-sanitize.js"></script>
 
-
-
     {{-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> --}}
 
-    @yield('style')
-
     <link rel="stylesheet" href="{{ asset('/assets/css/style.css?v=1.0.0') }}">
-    {{-- <link rel="stylesheet" href="/assets/css/rtl_style.css?v=1.0.0"> --}}
+    <script src="{{ asset('/assets/js/custom_functions.js?v=1.0.0') }}"></script>
+    <script src="{{ asset('/assets/js/ng_functions.js?v=1.0.0') }}"></script>
 
+    @yield('style')
     <script>
-        function suggOption(
-            parent,
-            url,
-            results,
-            placeholder = false,
-            html = false,
-            data = {},
-            extend = {}
-        ) {
-            var param = {
-                dropdownParent: !parent ? $(document.body) : parent,
-                debug: true,
-                theme: "bootstrap-5",
-                allowClear: false,
-                ajax: {
-                    url: url,
-                    delay: 350,
-                    method: "GET",
-                    dataType: "json",
-                    minimumInputLength: 2,
-                    cache: true,
-                    data: function(params) {
-                        return $.extend(true, data, {
-                            keyword: params.term
-                        });
-                    },
-                    processResults: function(data) {
-                        return {
-                            results: results(data)
-                        };
-                    },
-                },
-            };
-
-            if (placeholder !== false)
-                $.extend(param, {
-                    allowClear: true,
-                    placeholder: placeholder
-                });
-            if (!$.isEmptyObject(extend)) $.extend(param, extend);
-            if (html)
-                $.extend(param, {
-                    escapeMarkup: function(markup) {
-                        return markup;
-                    },
-                    templateResult: function(data) {
-                        return data.html;
-                    },
-                    templateSelection: function(data) {
-                        return data.text;
-                    },
-                });
-            return param;
-        }
-    </script>
-    <script>
-        let limit = 24;
+        const limit = 24;
     </script>
 </head>
