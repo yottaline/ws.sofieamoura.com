@@ -17,7 +17,7 @@
                                 @endforeach
                             </div>
                         @endif
-                        <form id="loginForm" action="#" method="post" role="form">
+                        <form id="loginForm" action="" method="post" role="form">
                             @csrf
                             <div class="mb-3 position-relative">
                                 <label for="login-email">Email<b class="text-danger">&ast;</b></label>
