@@ -28,16 +28,16 @@ class Retailer_address extends Model
     {
         $retailer_addresses = self::join('retailers', 'address_retailer', 'retailer_id')->join('locations', 'address_country', 'location_id');
 
-        if($params) $retailer_addresses->where($params);
+        if ($params) $retailer_addresses->where($params);
 
-        if($id) $retailer_addresses->where('address_id', $id);
+        if ($id) $retailer_addresses->where('address_id', $id);
 
         return $id ? $retailer_addresses->first() : $retailer_addresses->get();
     }
 
-    public static function submit($param, $id)
+    public static function submit($param, $id = null)
     {
-        if($id) return self::where('address_id', $id)->update($param) ? $id : false;
+        if ($id) return self::where('address_id', $id)->update($param) ? $id : false;
         $status = self::create($param);
         return $status ? $status->id : false;
     }

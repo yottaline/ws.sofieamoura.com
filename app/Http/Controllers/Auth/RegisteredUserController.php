@@ -48,15 +48,12 @@ class RegisteredUserController extends Controller
         $email = $request->email;
         $phone = $request->phone;
 
-
-        if(count(Retailer::fetch(0, [['retailer_id', '!=', $id], ['retailer_phone', $phone]])))
-        {
+        if (count(Retailer::fetch(0, [['retailer_id', '!=', $id], ['retailer_phone', $phone]]))) {
             echo json_encode(['status' => false, 'message' => __('Phone number already exists'),]);
             return;
         }
 
-        if($email &&  count(Retailer::fetch(0, [['retailer_id', '!=', $id], ['retailer_email', $email]])))
-        {
+        if ($email &&  count(Retailer::fetch(0, [['retailer_id', '!=', $id], ['retailer_email', $email]]))) {
             echo json_encode(['status' => false, 'message' => __('Email already exists'),]);
             return;
         }
@@ -77,12 +74,14 @@ class RegisteredUserController extends Controller
         ];
 
         $result = Retailer::submit($param, $id);
-        if($result)
-        {
-            $message = "New Retailer Registered:\n";
-            $message .= "Name: " . $request->name . "\n";
-            $message .= "Phone: " . $request->phone;
-
+        if ($result) {
+            $message = "New Retailer Registered:\n"
+                . "Name: " . $request->name . "\n"
+                . "Company: " . $request->company . "\n"
+                . "Email: " . $request->email . "\n"
+                . "Phone: " . $request->phone . "\n"
+                . "Country: " . $request->country . "\n"
+                . "City: " . $request->city;
 
             $this->telegramService->sendMessage($message, url("https://dash.sofieamoura.com//retailers/edit_approved/{$result}"));
         }
