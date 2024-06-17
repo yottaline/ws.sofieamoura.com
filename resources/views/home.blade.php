@@ -45,9 +45,10 @@
                                 <div class="d-flex">
                                     <div ng-if="o.info.prodcolor_media == null"
                                         class="order-img rounded align-self-start m-1"
-                                        style="background-image:url(/assets/img/default_product_image.png)"></div>
+                                        style="background-image:url({{ asset('assets/img/default_product_image.png') }})">
+                                    </div>
                                     <div ng-if="o.info.prodcolor_media" class="order-img rounded align-self-start m-1"
-                                        style="background-image:url({{ asset('media/product/') }}/<% o.info.product_id %>/<% o.info.media_file %>)">
+                                        style="background-image:url('http://dash.sofieamoura.com/media/product/<% o.info.product_id %>/<% o.info.media_file %>')">
                                     </div>
                                     <div class="flex-fill">
                                         <h6 class="small">
