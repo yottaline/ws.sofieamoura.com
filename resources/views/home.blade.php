@@ -1,5 +1,11 @@
 @extends('master')
 @section('title', 'Home')
+@section('search')
+    <form id="nvSearch" role="search">
+        <input type="search" name="q" class="form-control form-control-sm py-1 border-0 border-bottom"
+            placeholder="Search...">
+    </form>
+@endsection
 @section('style')
     <style>
         :root {
@@ -32,96 +38,42 @@
         }
     </style>
 @endsection
+
+@section('cart')
+    <a href="" id="cartBtn" class="d-inline-block link-dark bi bi-cart3 me-3 p-2"></a>
+    <script>
+        var cartCanvas;
+        $(function() {
+            cartCanvas = new bootstrap.Offcanvas('#cartCanvas');
+            $('#cartBtn').on('click', function(e) {
+                e.preventDefault();
+                cartCanvas.show();
+            });
+        });
+    </script>
+@endsection
+
 @section('content')
     <div class="container" data-ng-app="ngApp" data-ng-controller="ngCtrl">
-        <div class="row">
-            <div class="col-12 col-sm-4 col-lg-3">
-                <div class="card card-box">
-                    <div class="card-body">
-                        <h5 class="card-title fw-semibold text-uppercase">Rtailer Order</h5>
-                        <div ng-if="!fn.objectLen(order)" class="py-5 text-center">The list is empty</div>
-                        <div ng-if="fn.objectLen(order)">
-                            <div ng-repeat="(ok, o) in order" class="mb-3 border-bottom">
-                                <div class="d-flex">
-                                    <div ng-if="o.info.prodcolor_media == null"
-                                        class="order-img rounded align-self-start m-1"
-                                        style="background-image:url({{ asset('assets/img/default_product_image.png') }})">
-                                    </div>
-                                    <div ng-if="o.info.prodcolor_media" class="order-img rounded align-self-start m-1"
-                                        style="background-image:url('http://dash.sofieamoura.com/media/product/<% o.info.product_id %>/<% o.info.media_file %>')">
-                                    </div>
-                                    <div class="flex-fill">
-                                        <h6 class="small">
-                                            <span class="fw-bold me-2" ng-bind="o.info.product_name"></span>
-                                            <span class="font-monospace text-secondary"
-                                                ng-bind="'#'+o.info.product_code"></span>
-                                        </h6>
-                                        <table class="table mb-0">
-                                            <tbody>
-                                                <tr class="small" ng-repeat="(sk, s) in o.sizes">
-                                                    <td ng-bind="s.info.prodcolor_name"></td>
-                                                    <td width="40" class="text-center" ng-bind="s.info.size_name"></td>
-                                                    <td width="40" class="font-monospace text-center"
-                                                        ng-bind="s.info.prodsize_wsp">
-                                                    </td>
-                                                    <td width="30" class="font-monospace text-center" ng-bind="s.qty">
-                                                    </td>
-                                                    <td width="60" class="px-2 font-monospace text-center"
-                                                        ng-bind="fn.toFixed(s.total, 2)">
-                                                    </td>
-                                                    <td class="col-fit" ng-click="removeFromOrder(ok, sk)">
-                                                        <a href="" class="bi bi-x-circle link-danger"></a>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                                <div class="font-monospace small text-end">
-                                    <div class="me-3 d-inline-block">Qty: <span ng-bind="o.qty"></span></div>
-                                    <div class="d-inline-block">Total: <span ng-bind="fn.toFixed(o.total, 2)"></span></div>
-                                </div>
+        <div class="card card-box">
+            <div class="card-body">
+                <h5 ng-if="q" class="py-4 small">Results for <span class="text-primary" ng-bind='q'></span></h5>
+                <div ng-if="list.length" class="row">
+                    <div ng-repeat="(pk, p) in list" class="col-12 col-sm-6 col-lg-4 col-xl-3">
+                        <a href="" class="product-box" ng-click="viewProduct(pk)">
+                            <div ng-if="p.prodcolor_media == null" class="product-img rounded mb-2"
+                                style="background-image: url(/assets/img/default_product_image.png)"></div>
+                            <div ng-if="p.prodcolor_media" class="product-img rounded mb-2"
+                                style="background-image: url(<% mediaPath %>/<% p.product_id %>/<% p.media_file %>)">
                             </div>
-                            <div class="px-2 d-flex">
-                                <span class="fw-bold me-auto">Total</span>
-                                <span class="fw-bold font-monospace" ng-bind="fn.toFixed(orderTotal, 2)">0.00</span>
-                            </div>
-                            <div class="px-2 d-flex">
-                                <span class="fw-bold me-auto">Qty</span>
-                                <span class="fw-bold font-monospace" ng-bind="orderQty">0</span>
-                            </div>
-                            <div class="mt-3">
-                                <label for="orderNote">Note</label>
-                                <textarea id="orderNote" class="form-control form-control-sm" rows="2"></textarea>
-                            </div>
-                            <button class="btn btn-outline-dark w-100 btn-sm mt-3" ng-click="placeOrder()"
-                                ng-disabled="!fn.objectLen(order) || submitting">
-                                <span ng-if="submitting" class="spinner-border spinner-border-sm me-2"
-                                    role="status"></span>Place Order</button>
-                        </div>
+                            <h6 class="mb-0 text-dark fw-bold" ng-bind="p.product_name"></h6>
+                            <h6 class="small mb-0 text-secondary font-monospace" ng-bind="p.product_code"></h6>
+                            <h6 class="small mb-0 font-monospace text-dark"
+                                ng-bind="'EUR ' + fn.toFixed(+p.prodsize_wsp, 2)"></h6>
+                        </a>
                     </div>
                 </div>
-            </div>
-
-            <div class="col">
-                <div class="card card-box">
-                    <div class="card-body">
-                        <div ng-if="list.length" class="row">
-                            <div ng-repeat="(pk, p) in list" class="col-6 col-sm-4 col-md-3">
-                                <a href="" class="product-box" ng-click="viewProduct(pk)">
-                                    <div ng-if="p.prodcolor_media == null" class="product-img rounded mb-2"
-                                        style="background-image: url(/assets/img/default_product_image.png)"></div>
-                                    <div ng-if="p.prodcolor_media" class="product-img rounded mb-2"
-                                        style="background-image: url({{ asset('media/product/') }}/<% p.product_id %>/<% p.media_file %>)">
-                                    </div>
-                                    <h6 class="mb-0 text-dark fw-bold" ng-bind="p.product_name"></h6>
-                                    <h6 class="small mb-0 text-secondary font-monospace" ng-bind="p.product_code"></h6>
-                                </a>
-                            </div>
-                        </div>
-                        @include('layouts.loader')
-                    </div>
-                </div>
+                @include('layouts.loader')
             </div>
         </div>
 
@@ -135,7 +87,7 @@
                 <div ng-if="list[selectedProduct].prodcolor_media == null" class="product-img rounded"
                     style="background-image: url(/assets/img/default_product_image.png)"></div>
                 <div ng-if="list[selectedProduct].prodcolor_media" class="product-img rounded"
-                    style="background-image: url({{ asset('media/product/') }}/<% list[selectedProduct].product_id %>/<% list[selectedProduct].media_file %>)">
+                    style="background-image: url(<% mediaPath %>/<% list[selectedProduct].product_id %>/<% list[selectedProduct].media_file %>)">
                 </div>
                 <h6 class="fw-bold" ng-bind="list[selectedProduct].product_name"></h6>
                 <h6 class="text-secondary small" ng-bind="list[selectedProduct].season_name"></h6>
@@ -154,8 +106,8 @@
                                         </td>
                                         <td width="60">
                                             <input class="font-monospace text-center w-100 small prodsize-qty"
-                                                data-wsp="<% s.prodsize_wsp %>" data-size="<% ck+','+sk %>"
-                                                ng-model="s.qty" ng-change="calProductTotal()">
+                                                data-wsp="<% s.prodsize_wsp %>" data-size="<% ck+','+sk %>" ng-model="s.qty"
+                                                ng-change="calProductTotal()">
                                         </td>
                                         <td width="100" class="px-2 font-monospace text-center"
                                             ng-bind="fn.toFixed(s.qty * s.prodsize_wsp, 2)">
@@ -177,8 +129,79 @@
                 </div>
             </div>
         </div>
+
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="cartCanvas" aria-labelledby="cartCanvasLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="cartCanvasLabel">Order's Cart</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <div ng-if="!fn.objectLen(order)" class="py-5 text-center">
+                    <h1 class="display-4 bi bi-cart3 text-danger"></h1>
+                    <span class="text-secondary">Your cart is empty</span>
+                </div>
+                <div ng-if="fn.objectLen(order)">
+                    <div ng-repeat="(ok, o) in order" class="mb-3 border-bottom">
+                        <div class="d-flex">
+                            <div ng-if="o.info.prodcolor_media == null" class="order-img rounded align-self-start m-1"
+                                style="background-image:url({{ asset('assets/img/default_product_image.png') }})">
+                            </div>
+                            <div ng-if="o.info.prodcolor_media" class="order-img rounded align-self-start m-1"
+                                style="background-image:url('<% mediaPath %>/<% o.info.product_id %>/<% o.info.media_file %>')">
+                            </div>
+                            <div class="flex-fill">
+                                <h6 class="small">
+                                    <span class="fw-bold me-2" ng-bind="o.info.product_name"></span>
+                                    <span class="font-monospace text-secondary" ng-bind="'#'+o.info.product_code"></span>
+                                </h6>
+                                <table class="table mb-0">
+                                    <tbody>
+                                        <tr class="small" ng-repeat="(sk, s) in o.sizes">
+                                            <td ng-bind="s.info.prodcolor_name"></td>
+                                            <td width="40" class="text-center" ng-bind="s.info.size_name"></td>
+                                            <td width="40" class="font-monospace text-center"
+                                                ng-bind="s.info.prodsize_wsp">
+                                            </td>
+                                            <td width="30" class="font-monospace text-center" ng-bind="s.qty">
+                                            </td>
+                                            <td width="60" class="px-2 font-monospace text-center"
+                                                ng-bind="fn.toFixed(s.total, 2)">
+                                            </td>
+                                            <td class="col-fit" ng-click="removeFromOrder(ok, sk)">
+                                                <a href="" class="bi bi-x-circle link-danger"></a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="font-monospace small text-end py-2">
+                            <div class="me-3 d-inline-block">Qty: <span ng-bind="o.qty"></span></div>
+                            <div class="d-inline-block">Total: <span ng-bind="fn.toFixed(o.total, 2)"></span></div>
+                        </div>
+                    </div>
+                    <div class="px-2 d-flex">
+                        <span class="fw-bold me-auto">Total</span>
+                        <span class="fw-bold font-monospace" ng-bind="fn.toFixed(orderTotal, 2)">0.00</span>
+                    </div>
+                    <div class="px-2 d-flex">
+                        <span class="fw-bold me-auto">Qty</span>
+                        <span class="fw-bold font-monospace" ng-bind="orderQty">0</span>
+                    </div>
+                    <div class="mt-3">
+                        <label for="orderNote">Note</label>
+                        <textarea id="orderNote" class="form-control form-control-sm" rows="2"></textarea>
+                    </div>
+                    <button class="btn btn-outline-dark w-100 btn-sm mt-3" ng-click="placeOrder()"
+                        ng-disabled="!fn.objectLen(order) || submitting">
+                        <span ng-if="submitting" class="spinner-border spinner-border-sm me-2"
+                            role="status"></span>Place Order</button>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
+
 @section('js')
     <script>
         const productCanvas = new bootstrap.Offcanvas('#productCanvas');
@@ -189,7 +212,9 @@
             });
 
         ngApp.controller('ngCtrl', function($scope) {
+            $scope.mediaPath = 'https://dash.sofieamoura.com/public/media/product';
             $scope.fn = NgFunctions;
+            $scope.q = '';
             $scope.noMore = false;
             $scope.loading = false;
             $scope.submitting = false;
@@ -208,6 +233,7 @@
                 $.post("/products/load", {
                     offset: $scope.offset,
                     limit: limit,
+                    q: $scope.q,
                     _token: '{{ csrf_token() }}'
                 }, function(data) {
                     var ln = data.length;
@@ -233,7 +259,7 @@
                 $scope.selectedProduct = ndx;
                 $scope.colors = false;
                 productCanvas.show();
-                $.post('/product_sizes/load', {
+                $.post('/products/sizes', {
                     product_id: $scope.list[$scope.selectedProduct].product_id,
                     _token: '{{ csrf_token() }}'
                 }, function(data) {
@@ -331,45 +357,16 @@
             }
 
             $scope.placeOrder = function() {
-                var email = $('#retailerEmail').val(),
-                    name = $.trim($('#retailerName').val()),
-                    biz = $.trim($('#retailerBusiness').val()),
-                    phone = $.trim($('#retailerPhone').val()),
-                    country = +$('#retailerCountry').val(),
-                    city = $.trim($('#retailerCity').val()),
-                    address = $.trim($('#retailerAddress').val()),
-                    note = $.trim($('#orderNote').val()),
+                var note = $.trim($('#orderNote').val()),
                     obj = Object.values(scope.order),
                     qty = $(obj).map((n, e) => $(e.sizes).map((x, y) => y.qty).get()).get().join(),
                     sizes = $(obj).map((n, e) => $(e.sizes).map((x, y) => y.info.prodsize_id).get()).get()
                     .join();
-                if (!email || !validateEmail(email)) {
-                    $('#retailerEmail').focus();
-                    return;
-                }
-                if (!name) {
-                    $('#retailerName').focus();
-                    return;
-                }
-                if (!biz) {
-                    $('#retailerBusiness').focus();
-                    return;
-                }
-                if (!country) {
-                    $('#retailerCountry').focus();
-                    return;
-                }
+
                 $scope.submitting = true;
-                $.post('/ws_orders/submit', {
+                $.post('/orders/submit', {
                     qty: qty,
                     sizes: sizes,
-                    email: email,
-                    name: name,
-                    biz: biz,
-                    country: country,
-                    city: city,
-                    phone: phone,
-                    address: address,
                     note: note,
                     _token: '{{ csrf_token() }}',
                 }, function(response) {
@@ -387,8 +384,14 @@
         });
 
         $(function() {
-            // $('.select2').select2();
-
+            $('#nvSearch').on('submit', function(e) {
+                e.preventDefault();
+                scope.$apply(() => {
+                    scope.list = [];
+                    scope.q = $.trim($(this).find('input').val());
+                });
+                scope.load(true);
+            });
         });
 
         const validateEmail = email => {

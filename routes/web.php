@@ -9,12 +9,20 @@ Route::middleware('auth')->group(function () {
     Route::get('/', fn () => view('home'));
 
     Route::prefix('products')->group(function () {
-        Route::get('/', 'WsProductController@index');
+        Route::post('/', 'WsProductController@index');
         Route::post('load', 'WsProductController@load');
-        Route::get('view/{ref}', 'WsProductController@view');
+        Route::post('sizes', 'WsProductsSizeController@load');
+        Route::post('media', 'ProductsMediaController@load');
     });
 
-    Route::get('profile', 'ProfileController@edit');
+    Route::prefix('orders')->group(function () {
+        Route::get('/', 'WsOrderController@index');
+        Route::post('load', 'WsOrderController@load');
+        Route::post('submit', 'WsOrderController@submit');
+        Route::get('view/{id}', 'WsOrderController@view');
+    });
+
+    Route::get('profile', 'ProfileController@index');
     Route::put('update', 'ProfileController@update');
 });
 

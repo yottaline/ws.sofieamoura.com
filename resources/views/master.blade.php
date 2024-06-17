@@ -4,12 +4,17 @@
 @include('layouts.head')
 
 <body id="page-top">
-    <nav class="navbar px-2 fixed-top" style="background-color: #e3f2fd;">
-        <div class="d-flex w-100 align-items-center">
-            <div class="me-auto">
-                <a class="navbar-brand fw-bold" href="/">Sofie Amoura</a>
+    <nav class="navbar px-2 fixed-top" style="background-color: #fff;">
+        <div class="d-flex w-100">
+            <div class="me-auto px-3">
+                <a class="navbar-brand fw-bold" href="/">
+                    <img src="/assets/img/logo.png" alt="Sofie Amoura" draggable="false" width="180"></a>
             </div>
             @yield('search')
+            <div class="px-3">
+                @yield('cart')
+                <a href="/profile" class="d-inline-block link-dark bi bi-person-circle p-2"></a>
+            </div>
         </div>
     </nav>
 

@@ -38,36 +38,18 @@ class Retailer extends Authenticatable
         'retailer_created'
     ];
 
-    public static function fetch($id = 0, $params = null, $limit = null, $lastId = null)
+    static function fetch($id)
     {
         $retailers = self::join('locations', 'retailer_country', 'location_id')
-        ->join('currencies', 'retailer_currency', 'currency_id')->orderBy('retailer_created', 'DESC')->limit($limit);
+            ->join('currencies', 'retailer_currency', 'currency_id')
+            ->where('retailer_id', $id);
 
-        if (isset($params['q'])) {
-            $retailers->where(function (Builder $query) use ($params) {
-                $query->where('retailer_email', 'like', '%' . $params['q'] . '%')
-                ->orWhere('retailer_phone', 'like', '%' . $params['q'] . '%')
-                ->orWhere('retailer_fullName', $params['q'])
-                ->orWhere('retailer_company', $params['q'])
-                ->orWhere('retailer_address', $params['q'])
-                ->orWhere('retailer_adv_payment', $params['q']);
-            });
-
-            unset($params['q']);
-        }
-
-        if($lastId) $retailers->where('retailer_id', '<', $lastId);
-
-        if($params) $retailers->where($params);
-
-        if($id) $retailers->where('retailer_id', $id);
-
-        return $id ? $retailers->first() : $retailers->get();
+        return $retailers->first();
     }
 
-    public static function submit($param, $id)
+    static function submit($param, $id)
     {
-        if($id) return self::where('retailer_id', $id)->update($param) ? $id : false;
+        if ($id) return self::where('retailer_id', $id)->update($param) ? $id : false;
         $status = self::create($param);
         return $status ? $status->id : false;
     }
