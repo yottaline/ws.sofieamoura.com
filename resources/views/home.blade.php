@@ -1,11 +1,13 @@
 @extends('master')
 @section('title', 'Home')
+
 @section('search')
     <form id="nvSearch" role="search">
         <input type="search" name="q" class="form-control form-control-sm py-1 border-0 border-bottom"
             placeholder="Search...">
     </form>
 @endsection
+
 @section('style')
     <style>
         :root {
