@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Http;
 
 Route::post('locations/load', 'LocationController@load');
 Route::get('account/request', fn () => view('contents.profile.request'));
@@ -24,7 +25,11 @@ Route::middleware('auth')->group(function () {
 
     Route::get('profile', 'ProfileController@index');
     Route::put('update', 'ProfileController@update');
+
 });
+
+
+// Route::get('test', 'ProfileController@test');
 
 // Route::post('register_retailer', 'RetailerController@submit');
 

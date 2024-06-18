@@ -10,18 +10,27 @@ use App\Models\Currency;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\File;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use App\Services\TelegramService;
 
 class ProfileController extends Controller
 {
-    function __construct()
+
+    protected $telegramService;
+
+    public function __construct(TelegramService $telegramService)
     {
-        $this->middleware('auth');
+        $this->telegramService = $telegramService;
     }
+    // function __construct()
+    // {
+    //     $this->middleware('auth');
+    // }
 
     function index()
     {
@@ -99,4 +108,5 @@ class ProfileController extends Controller
             'data'   => $result ? Retailer::fetch($result) : []
         ]);
     }
+
 }
