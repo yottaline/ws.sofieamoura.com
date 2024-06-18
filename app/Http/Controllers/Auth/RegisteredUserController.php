@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Retailer;
 use App\Providers\RouteServiceProvider;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -41,19 +42,21 @@ class RegisteredUserController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email'],
-            // 'password' => ['required',],
         ]);
 
         $id    = $request->retailer_id;
         $email = $request->email;
         $phone = $request->phone;
 
-        if (count(Retailer::fetch(0, [['retailer_id', '!=', $id], ['retailer_phone', $phone]]))) {
+        if(count(Retailer::where('retailer_phone', $phone)->get()))
+        {
             echo json_encode(['status' => false, 'message' => __('Phone number already exists'),]);
             return;
         }
 
-        if ($email &&  count(Retailer::fetch(0, [['retailer_id', '!=', $id], ['retailer_email', $email]]))) {
+
+        if($email &&  count(Retailer::where('retailer_email', $email)->get()))
+        {
             echo json_encode(['status' => false, 'message' => __('Email already exists'),]);
             return;
         }
@@ -74,6 +77,8 @@ class RegisteredUserController extends Controller
         ];
 
         $result = Retailer::submit($param, $id);
+  
+
         if ($result) {
             $message = "New Retailer Registered:\n"
                 . "Name: " . $request->name . "\n"
@@ -82,8 +87,11 @@ class RegisteredUserController extends Controller
                 . "Phone: " . $request->phone . "\n"
                 . "Country: " . $request->country . "\n"
                 . "City: " . $request->city;
+  $data = [
+                'id' => $result,
+            ];
 
-            $this->telegramService->sendMessage($message, url("https://dash.sofieamoura.com//retailers/edit_approved/{$result}"));
+            $this->telegramService->sendMessage($message, Http::put("https://dash.sofieamoura.com/retailers/edit_approved", $data));
         }
         echo json_encode([
             'status' => boolval($request),

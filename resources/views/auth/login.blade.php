@@ -185,7 +185,12 @@
                         contentType: false,
                         dataType: "json",
                     }).done(function(data, textStatus, jqXHR) {
-                        if (data.status) location.replace('/account/request');
+                        if (data.status) {
+                            toastr.success(
+                                "Your account has been created successfully. The account will be approved after 3 minutes"
+                            );
+                            cls();
+                        } else toastr.error(data.message);
                     }).fail(function(jqXHR, textStatus, errorThrown) {
                         toastr.error(jqXHR.responseJSON.message);
                     }).always(function() {
@@ -194,5 +199,16 @@
                 }
             });
         });
+
+        function cls() {
+            $('#retailerName').val('');
+            $('#email').val('');
+            $('#phone').val('');
+            $('#company').val('');
+            $('#province').val('');
+            $('#city').val('');
+            $('#zipCode').val('');
+            $('#address').val('');
+        }
     </script>
 </x-guest-layout>

@@ -23,6 +23,16 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <script>
+        toastr.options.closeButton = true;
+        toastr.options.progressBar = true;
+        toastr.options.positionClass = "toast-bottom-left";
+        toastr.options.timeOut = 5000;
+        toastr.options.preventDuplicates = true;
+    </script>
+
     <style>
         .card {
             max-width: 400px;
