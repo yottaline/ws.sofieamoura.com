@@ -194,8 +194,11 @@
                         <label for="orderNote">Note</label>
                         <textarea id="orderNote" class="form-control form-control-sm" rows="2"></textarea>
                     </div>
+                    <p ng-if="+orderTotal < 2000" class="m-0 mt-3 text-danger">
+                        <i class="bi bi-info-circle me-1"></i>Min order amount EUR 2000
+                    </p>
                     <button class="btn btn-outline-dark w-100 btn-sm mt-3" ng-click="placeOrder()"
-                        ng-disabled="!fn.objectLen(order) || submitting">
+                        ng-disabled="!fn.objectLen(order) || submitting || orderTotal < 2000">
                         <span ng-if="submitting" class="spinner-border spinner-border-sm me-2"
                             role="status"></span>Place Order</button>
                 </div>
