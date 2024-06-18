@@ -1,11 +1,13 @@
 @extends('master')
 @section('title', 'Home')
+
 @section('search')
     <form id="nvSearch" role="search">
         <input type="search" name="q" class="form-control form-control-sm py-1 border-0 border-bottom"
             placeholder="Search...">
     </form>
 @endsection
+
 @section('style')
     <style>
         :root {
@@ -192,8 +194,11 @@
                         <label for="orderNote">Note</label>
                         <textarea id="orderNote" class="form-control form-control-sm" rows="2"></textarea>
                     </div>
+                    <p ng-if="+orderTotal < 2000" class="m-0 mt-3 text-danger">
+                        <i class="bi bi-info-circle me-1"></i>Min order amount EUR 2000
+                    </p>
                     <button class="btn btn-outline-dark w-100 btn-sm mt-3" ng-click="placeOrder()"
-                        ng-disabled="!fn.objectLen(order) || submitting">
+                        ng-disabled="!fn.objectLen(order) || submitting || orderTotal < 2000">
                         <span ng-if="submitting" class="spinner-border spinner-border-sm me-2"
                             role="status"></span>Place Order</button>
                 </div>
@@ -260,7 +265,7 @@
                 $scope.colors = false;
                 productCanvas.show();
                 $.post('/products/sizes', {
-                    product_id: $scope.list[$scope.selectedProduct].product_id,
+                    slug: $scope.list[$scope.selectedProduct].prodcolor_slug,
                     _token: '{{ csrf_token() }}'
                 }, function(data) {
                     var colors = {};

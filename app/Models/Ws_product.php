@@ -19,12 +19,12 @@ class Ws_product extends Model
     {
         $products = self::join('seasons', 'product_season', 'season_id')
             ->join('categories', 'product_category', 'category_id')
-            ->leftJoin('ws_products_colors', 'product_id', 'prodcolor_product')
-            ->leftJoin('ws_products_sizes', 'product_id', 'prodsize_product')
-            ->leftJoin('products_media', 'prodcolor_media', 'media_id')
+            ->join('ws_products_colors', 'product_id', 'prodcolor_product')
+            ->join('ws_products_sizes', 'product_id', 'prodsize_product')
+            ->join('products_media', 'prodcolor_media', 'media_id')
             ->orderBy('prodcolor_order', 'ASC')
             ->orderBy('product_id', 'ASC')
-            ->limit($limit)->offset($offset)->groupBy('product_id');
+            ->limit($limit)->offset($offset)->groupBy('prodcolor_slug');
 
         if (isset($params['q'])) {
             $products->where(function (Builder $query) use ($params) {

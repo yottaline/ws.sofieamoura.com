@@ -101,7 +101,7 @@ class ProfileController extends Controller
                 'address_phone'     => $phone,
                 'address_note'      => $request->address,
             ];
-            Retailer_address::submit($paramAddress, null);
+            Retailer_address::submit($paramAddress);
         };
         echo json_encode([
             'status' => boolval($result),

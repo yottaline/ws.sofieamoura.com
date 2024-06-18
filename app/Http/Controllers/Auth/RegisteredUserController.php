@@ -44,20 +44,17 @@ class RegisteredUserController extends Controller
             'email' => ['required', 'string', 'lowercase', 'email'],
         ]);
 
-        $id    = $request->retailer_id;
         $email = $request->email;
-        $phone = $request->phone;
+        $phone = $request->phone ?? '';
 
-        // return $request;
-        if(count(Retailer::where('retailer_phone', $phone)->get()))
-        {
-            echo json_encode(['status' => false, 'message' => __('Phone number already exists'),]);
+        if (count(Retailer::where('retailer_phone', $phone)->get())) {
+            echo json_encode(['status' => false, 'message' => __('This phone number is already registered'),]);
             return;
         }
 
-        if($email &&  count(Retailer::where('retailer_email', $email)->get()))
-        {
-            echo json_encode(['status' => false, 'message' => __('Email already exists'),]);
+
+        if ($email &&  count(Retailer::where('retailer_email', $email)->get())) {
+            echo json_encode(['status' => false, 'message' => __('This email address is already registered'),]);
             return;
         }
 
@@ -69,14 +66,15 @@ class RegisteredUserController extends Controller
             'retailer_password'     => Hash::make('0000'),
             'retailer_company'      => $request->company,
             'retailer_country'      => $request->country,
-            'retailer_province'     => $request->province,
+            'retailer_province'     => $request->province ?? '',
             'retailer_city'         => $request->city,
-            'retailer_address'      => $request->address,
+            'retailer_zip'         => $request->zip ?? '',
+            'retailer_address'      => $request->address ?? '',
             'retailer_currency'     => 1,
             'retailer_created'      => Carbon::now()
         ];
 
-        $result = Retailer::submit($param, $id);
+        $result = Retailer::submit($param);
 
         // if(boolval($result))
         // {

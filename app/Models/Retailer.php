@@ -26,6 +26,7 @@ class Retailer extends Authenticatable
         'retailer_country',
         'retailer_province',
         'retailer_city',
+        'retailer_zip',
         'retailer_address',
         'retailer_shipAdd',
         'retailer_billAdd',
@@ -47,7 +48,7 @@ class Retailer extends Authenticatable
         return $retailers->first();
     }
 
-    static function submit($param, $id)
+    static function submit($param, $id = null)
     {
         if ($id) return self::where('retailer_id', $id)->update($param) ? $id : false;
         $status = self::create($param);

@@ -14,7 +14,7 @@
             <div class="px-3">
                 @yield('cart')
                 <a href="/profile" class="d-inline-block link-dark bi bi-person-circle p-2"></a>
-                <a href="" id="logoutBtn" class="d-inline-block link-dark bi bi-power p-2"></a>
+                {{-- <a href="" id="logoutBtn" class="d-inline-block link-dark bi bi-power p-2"></a> --}}
                 <form id="logoutForm" action="{{ route('logout') }}" method="post" class="d-none">
                     @csrf
                     <button type="submit" class="d-none"><i class="bi bi-power text-danger"></i></button>
