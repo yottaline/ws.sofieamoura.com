@@ -1,20 +1,10 @@
-@extends('master')
-@section('title', 'Account Request')
-@section('content')
-    <div class="container" ng-app="ngApp" ng-controller="ngCtrl">
-        <p class="my-5" style="width: 300px; mx-auto text-center">
-            Request Sent...
-        </p>
+<x-guest-layout>
+    <div class="text-center container">
+        <h3 class="my-5">
+            <img src="/assets/img/logo.png" alt="Sofie Amoura" draggable="false" width="200">
+        </h3>
+
+        <p>Your request has been successfully submitted and being processed<br>
+            You will receive an account activation email soon</p>
     </div>
-@endsection
-@section('js')
-    <script>
-        var scope, ngApp = angular.module("ngApp", ['ngSanitize'], function($interpolateProvider) {
-            $interpolateProvider.startSymbol('<%');
-            $interpolateProvider.endSymbol('%>');
-        });
-        ngApp.controller("ngCtrl", function($scope) {
-            scope = $scope;
-        });
-    </script>
-@endsection
+</x-guest-layout>

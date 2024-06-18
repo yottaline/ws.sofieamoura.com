@@ -185,30 +185,15 @@
                         contentType: false,
                         dataType: "json",
                     }).done(function(data, textStatus, jqXHR) {
-                        if (data.status) {
-                            toastr.success(
-                                "Your account has been created successfully. The account will be approved after 3 minutes"
-                            );
-                            cls();
-                        } else toastr.error(data.message);
+                        if (data.status) location.replace('/account/request');
+                        else toastr.error(data.message);
                     }).fail(function(jqXHR, textStatus, errorThrown) {
-                        toastr.error(jqXHR.responseJSON.message);
+                        console.log(jqXHR.responseJSON.message);
                     }).always(function() {
                         scope.$apply(() => scope.register = false);
                     });
                 }
             });
         });
-
-        function cls() {
-            $('#retailerName').val('');
-            $('#email').val('');
-            $('#phone').val('');
-            $('#company').val('');
-            $('#province').val('');
-            $('#city').val('');
-            $('#zipCode').val('');
-            $('#address').val('');
-        }
     </script>
 </x-guest-layout>
