@@ -26,6 +26,7 @@ class Retailer extends Authenticatable
         'retailer_country',
         'retailer_province',
         'retailer_city',
+        'retailer_zip',
         'retailer_address',
         'retailer_shipAdd',
         'retailer_billAdd',

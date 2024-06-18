@@ -66,9 +66,10 @@ class RegisteredUserController extends Controller
             'retailer_password'     => Hash::make('0000'),
             'retailer_company'      => $request->company,
             'retailer_country'      => $request->country,
-            'retailer_province'     => $request->province,
+            'retailer_province'     => $request->province ?? '',
             'retailer_city'         => $request->city,
-            'retailer_address'      => $request->address,
+            'retailer_zip'         => $request->zip ?? '',
+            'retailer_address'      => $request->address ?? '',
             'retailer_currency'     => 1,
             'retailer_created'      => Carbon::now()
         ];
