@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Retailer;
 use App\Providers\RouteServiceProvider;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -82,8 +83,11 @@ class RegisteredUserController extends Controller
             $message .= "Name: " . $request->name . "\n";
             $message .= "Phone: " . $request->phone;
 
+            $data = [
+                'id' => $result,
+            ];
 
-            $this->telegramService->sendMessage($message, url("https://dash.sofieamoura.com//retailers/edit_approved/{$result}"));
+            $this->telegramService->sendMessage($message, Http::put("https://dash.sofieamoura.com/retailers/edit_approved", $data));
         }
         echo json_encode([
             'status' => boolval($request),
