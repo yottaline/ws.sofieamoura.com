@@ -44,20 +44,17 @@ class RegisteredUserController extends Controller
             'email' => ['required', 'string', 'lowercase', 'email'],
         ]);
 
-        $id    = $request->retailer_id;
         $email = $request->email;
-        $phone = $request->phone;
+        $phone = $request->phone ?? '';
 
-        if(count(Retailer::where('retailer_phone', $phone)->get()))
-        {
-            echo json_encode(['status' => false, 'message' => __('Phone number already exists'),]);
+        if (count(Retailer::where('retailer_phone', $phone)->get())) {
+            echo json_encode(['status' => false, 'message' => __('This phone number is already registered'),]);
             return;
         }
 
 
-        if($email &&  count(Retailer::where('retailer_email', $email)->get()))
-        {
-            echo json_encode(['status' => false, 'message' => __('Email already exists'),]);
+        if ($email &&  count(Retailer::where('retailer_email', $email)->get())) {
+            echo json_encode(['status' => false, 'message' => __('This email address is already registered'),]);
             return;
         }
 
@@ -76,23 +73,19 @@ class RegisteredUserController extends Controller
             'retailer_created'      => Carbon::now()
         ];
 
-        $result = Retailer::submit($param, $id);
-  
-
+        $result = Retailer::submit($param);
         if ($result) {
             $message = "New Retailer Registered:\n"
-                . "Name: " . $request->name . "\n"
-                . "Company: " . $request->company . "\n"
-                . "Email: " . $request->email . "\n"
-                . "Phone: " . $request->phone . "\n"
-                . "Country: " . $request->country . "\n"
-                . "City: " . $request->city;
-  $data = [
-                'id' => $result,
-            ];
-
+                . "Name: {$request->name}\n"
+                . "Company: {$request->company}\n"
+                . "Email: {$request->email}\n"
+                . "Phone: {$request->phone}\n"
+                . "Country: {$request->country}\n"
+                . "City: {$request->city}";
+            $data = ['id' => $result];
             $this->telegramService->sendMessage($message, Http::put("https://dash.sofieamoura.com/retailers/edit_approved", $data));
         }
+
         echo json_encode([
             'status' => boolval($request),
             'data'   => $result ? Retailer::fetch($result) : []
