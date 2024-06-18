@@ -48,12 +48,12 @@ class RegisteredUserController extends Controller
         $email = $request->email;
         $phone = $request->phone;
 
-        // return $request;
         if(count(Retailer::where('retailer_phone', $phone)->get()))
         {
             echo json_encode(['status' => false, 'message' => __('Phone number already exists'),]);
             return;
         }
+
 
         if($email &&  count(Retailer::where('retailer_email', $email)->get()))
         {
@@ -77,13 +77,17 @@ class RegisteredUserController extends Controller
         ];
 
         $result = Retailer::submit($param, $id);
-        if($result)
-        {
-            $message = "New Retailer Registered:\n";
-            $message .= "Name: " . $request->name . "\n";
-            $message .= "Phone: " . $request->phone;
+  
 
-            $data = [
+        if ($result) {
+            $message = "New Retailer Registered:\n"
+                . "Name: " . $request->name . "\n"
+                . "Company: " . $request->company . "\n"
+                . "Email: " . $request->email . "\n"
+                . "Phone: " . $request->phone . "\n"
+                . "Country: " . $request->country . "\n"
+                . "City: " . $request->city;
+  $data = [
                 'id' => $result,
             ];
 
