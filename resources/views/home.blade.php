@@ -260,7 +260,7 @@
                 $scope.colors = false;
                 productCanvas.show();
                 $.post('/products/sizes', {
-                    product_id: $scope.list[$scope.selectedProduct].product_id,
+                    slug: $scope.list[$scope.selectedProduct].prodcolor_slug,
                     _token: '{{ csrf_token() }}'
                 }, function(data) {
                     var colors = {};
