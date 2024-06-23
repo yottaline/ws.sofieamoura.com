@@ -14,14 +14,15 @@ class TelegramService
     public function __construct()
     {
         $this->client = new Client();
-        $this->botToken = '7222495229:AAEJqA6pUj9xZIQDQ7AgsN_9O3rMNkk4dfg';
-        $this->chatId = '-4232852781';
+        $this->botToken = '7376915935:AAHsHdkos2awyayD_0QyhX8XwlhJQD7LS3U';
+        $this->chatId = '4232852781';
     }
 
     public function sendMessage($message, $buttonUrl)
     {
-        $response = Http::post("https://api.telegram.org/bot{$this->botToken}/sendMessage", [
-            'chat_id' => '-4232852781',
+
+        $response = Http::post("https://api.telegram.org/bot7376915935:AAHsHdkos2awyayD_0QyhX8XwlhJQD7LS3U/sendMessage", [
+            'chat_id' => '7279961590',
             'text' => $message,
             'reply_markup' => json_encode([
                 'inline_keyboard' => [[
