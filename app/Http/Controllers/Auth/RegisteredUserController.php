@@ -83,7 +83,6 @@ class RegisteredUserController extends Controller
             . "Country: {$request->country}\n"
             . "City: {$request->city}";
 
-        $data = ['id' => $result];
         Http::post("https://api.telegram.org/bot7222495229:AAEJqA6pUj9xZIQDQ7AgsN_9O3rMNkk4dfg/sendMessage", [
             'chat_id' => '-4232852781',
             'text' => $message,
@@ -91,8 +90,7 @@ class RegisteredUserController extends Controller
                 'inline_keyboard' => [[
                     [
                         'text' => 'Approved Request',
-                        'url' =>  "https://dash.sofieamoura.com/retailers/edit_approved", 
-                        $data
+                        'url' =>  "https://dash.sofieamoura.com/retailers/edit_approved?id={$result}",
                     ]
                 ]]
             ])
