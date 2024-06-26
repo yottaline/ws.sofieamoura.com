@@ -14,7 +14,6 @@ class Ws_products_size extends Model
 
     protected $fillable = [];
 
-
     static function fetch($id = 0, $params = null, $ids = null)
     {
         $ws_products_sizes = self::join('ws_products', 'prodsize_product', 'product_id')

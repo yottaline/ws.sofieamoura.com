@@ -3,7 +3,8 @@
         <div class="card m-auto mt-5" style="max-width: 350px">
             <div class="card-body">
                 <div class="mb-4 text-sm text-gray-600">
-                    {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
+                    <b>Forgot your password? No problem</b><br>
+                    <small>Enter your email address and we will email you a password reset link</small>
                 </div>
 
                 <!-- Session Status -->
@@ -19,11 +20,11 @@
                     </div>
 
                     <div class="text-center">
-                        <button type="submit" class="btn btn-outline-dark px-4">{{ __('Email a Reset Link') }}</button>
+                        <button type="submit"
+                            class="btn btn-outline-dark px-4 rounded-pill">{{ __('Email a Reset Link') }}</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-
 </x-guest-layout>

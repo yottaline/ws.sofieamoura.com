@@ -1,5 +1,5 @@
 @extends('master')
-@section('title', 'Account Info')
+@section('title', 'Orders History')
 
 @section('content')
     <div class="container" data-ng-app="ngApp" data-ng-controller="ngCtrl">
@@ -11,6 +11,26 @@
                 <div class="card card-box border">
                     <div class="card-body">
                         <h5 class="card-title fw-bold text-uppercase">Account Info</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container" data-ng-app="ngApp" data-ng-controller="ngCtrl">
+        <div class="row">
+            <div class="col-12 col-sm-4 col-lg-3">
+                @include('profile.side_bar')
+            </div>
+            <div class="col">
+                <div class="card card-box">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold text-uppercase">Orders</h5>
+                        <div ng-if="list.length" class="table-responsive">
+                            <div ng-repeat="o in list">
+
+                            </div>
+                        </div>
+                        @include('layouts.loader')
                     </div>
                 </div>
             </div>
@@ -63,11 +83,5 @@
             // $scope.load();
             scope = $scope;
         });
-
-        const validateEmail = email => {
-            return String(email).toLowerCase().match(
-                /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-            );
-        };
     </script>
 @endsection

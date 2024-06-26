@@ -38,11 +38,104 @@
             background-repeat: no-repeat;
             background-size: contain;
         }
+
+        #preview-area {
+            padding: 20px;
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background-color: rgba(0, 0, 0, .9);
+        }
+
+        #preview-area .zoom_canvas {
+            /* margin: 20px;
+                                                                                                                                                                        padding: 10px; */
+            background-repeat: no-repeat;
+            background-position: 50%;
+            cursor: crosshair;
+            /* -webkit-transition: all 0.2s;
+                                                                                                                                                                        -moz-transition: all 0.2s;
+                                                                                                                                                                        -o-transition: all 0.2s;
+                                                                                                                                                                        transition: all 0.2s; */
+        }
+
+        #preview-area .close-btn {
+            font-size: 20px;
+            position: absolute;
+            line-height: 35px;
+            text-align: center;
+            right: 15px;
+            top: 15px;
+            display: block;
+            height: 35px;
+            width: 35px;
+            background: rgba(0, 0, 0, .7);
+            border-radius: 50%;
+        }
+
+        #thumbs {
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            list-style-type: none;
+        }
+
+        #thumbs>li {
+            display: inline-block;
+            /* height: 100px; */
+            /* width: 100px; */
+            margin: 10px;
+        }
+
+        a.thumb-opt:link,
+        a.thumb-opt:visited {
+            display: block;
+            height: 100px;
+            /* border: 1px solid #f2f2f2; */
+            /* margin-top: 15px; */
+            /* background-color: #1d1d1d; */
+        }
+
+        /* a.thumb-opt:hover,
+                                                    a.thumb-opt:focus,
+                                                    a.thumb-opt:active,
+                                                    a.thumb-opt.active {
+                                                        border-color: #1d1d1d;
+                                                    } */
+
+        /* a.thumb-opt:hover>img,
+                                                    a.thumb-opt:focus>img,
+                                                    a.thumb-opt:active>img {
+                                                        opacity: .9
+                                                    } */
+
+        .thumb-opt>img {
+            /* width: 100%; */
+            height: 100%;
+            transition: all .25s ease
+        }
+
+        .carousel-item {
+            cursor: zoom-in;
+            height: 400px;
+            line-height: 400px;
+            text-align: center;
+            background-repeat: no-repeat;
+            background-size: contain;
+            background-position: center;
+            transition: transform .6s ease, opacity .3s ease-out
+        }
     </style>
 @endsection
 
 @section('cart')
-    <a href="" id="cartBtn" class="d-inline-block link-dark bi bi-cart3 me-3 p-2"></a>
+    <a href="" id="cartBtn" class="h6 m-0 d-inline-block link-secondary bi bi-cart3 me-1 p-2 position-relative">
+        @if (!empty($cart))
+            <span class="position-absolute translate-middle bg-danger border border-light rounded-circle"
+                style="right: -2px; top: 13px; padding: 5px"></span>
+        @endif
+    </a>
     <script>
         var cartCanvas;
         $(function() {
@@ -86,11 +179,40 @@
                 <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
             <div ng-if="selectedProduct !== false" class="offcanvas-body">
-                <div ng-if="list[selectedProduct].prodcolor_media == null" class="product-img rounded"
+                <div ng-if="media.length">
+                    <div id="carousel" class="carousel carousel-dark slide" data-bs-ride="carousel">
+                        <div class="carousel-indicators d-lg-none">
+                            <button ng-repeat="m in media" type="button" ng-class="$first ? 'active' : ''"
+                                data-bs-target="#carousel" data-bs-slide-to="<% $index %>"></button>
+                        </div>
+                        <div class="carousel-inner">
+                            <div ng-repeat="m in media" class="carousel-item" data-type="1"
+                                ng-class="$first ? 'active' : ''"
+                                data-image="<% mediaPath %>/<% m.product_id %>/<% m.media_file %>"
+                                style="background-image: url(<% mediaPath %>/<% m.product_id %>/<% m.media_file %>)"></div>
+                        </div>
+                    </div>
+
+                    <div class="d-none d-lg-block mt-3">
+                        <ul id="thumbs">
+                            <li ng-repeat="m in media">
+                                <a href="" class="thumb-opt rounded" data-slide-to="<% $index %>"
+                                    ng-class="$first ? 'default-photo active' : ''" alt=""
+                                    data-image="<% mediaPath %>/<% m.product_id %>/<% m.media_file %>"
+                                    data-zoom-image="<% mediaPath %>/<% m.product_id %>/<% m.media_file %>">
+                                    <img src="<% mediaPath %>/<% m.product_id %>/<% m.media_file %>">
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                {{-- <div ng-if="list[selectedProduct].prodcolor_media == null" class="product-img rounded"
                     style="background-image: url(/assets/img/default_product_image.png)"></div>
                 <div ng-if="list[selectedProduct].prodcolor_media" class="product-img rounded"
                     style="background-image: url(<% mediaPath %>/<% list[selectedProduct].product_id %>/<% list[selectedProduct].media_file %>)">
-                </div>
+                </div> --}}
+
                 <h6 class="fw-bold" ng-bind="list[selectedProduct].product_name"></h6>
                 <h6 class="text-secondary small" ng-bind="list[selectedProduct].season_name"></h6>
                 <div class="py-4">
@@ -108,8 +230,8 @@
                                         </td>
                                         <td width="60">
                                             <input class="font-monospace text-center w-100 small prodsize-qty"
-                                                data-wsp="<% s.prodsize_wsp %>" data-size="<% ck+','+sk %>" ng-model="s.qty"
-                                                ng-change="calProductTotal()">
+                                                data-wsp="<% s.prodsize_wsp %>" data-size="<% ck+','+sk %>"
+                                                ng-model="s.qty" ng-change="calProductTotal()">
                                         </td>
                                         <td width="100" class="px-2 font-monospace text-center"
                                             ng-bind="fn.toFixed(s.qty * s.prodsize_wsp, 2)">
@@ -205,17 +327,60 @@
             </div>
         </div>
     </div>
+    <div id="preview-area">
+        <a href="#" class="close-btn text-light float-end bi bi-x"></a>
+        <div class="zoom_canvas h-100"></div>
+    </div>
 @endsection
 
 @section('js')
     <script>
-        const productCanvas = new bootstrap.Offcanvas('#productCanvas');
-        var scope,
+        const productCanvas = new bootstrap.Offcanvas('#productCanvas'),
+            img = new Image(),
+            preloaderImg = "{{ asset('/assets/img/preloader/preloader-white-32.gif') }}";
+
+        const validateEmail = email => {
+            return String(email).toLowerCase().match(
+                /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+            );
+        };
+
+        const zoomController = function(e) {
+            e.preventDefault();
+            var zoom_canvas = $(this),
+                xP = '50%',
+                yP = '50%',
+                x = 0,
+                y = 0,
+                pageX = e.pageX || e.originalEvent.touches[0].pageX,
+                pageY = e.pageY || e.originalEvent.touches[0].pageY,
+                width = zoom_canvas.width(),
+                height = zoom_canvas.height();
+
+            if (img.naturalWidth > width) {
+                x = pageX - zoom_canvas.offset().left;
+                xP = parseFloat((x / width * 100).toFixed(2));
+                xP = xP > 100 ? 100 : (xP < 0 ? 0 : xP);
+            }
+            if (img.naturalHeight > height) {
+                y = pageY - zoom_canvas.offset().top;
+                yP = parseFloat((y / height * 100).toFixed(2));
+                yP = yP > 100 ? 100 : (yP < 0 ? 0 : yP);
+            }
+
+            console.log(`${xP}% ${yP}%`);
+            zoom_canvas.css('background-position-x', `${xP}%`);
+            zoom_canvas.css('background-position-y', `${yP}%`);
+        }
+        img.onload = function() {
+            $('.zoom_canvas').css('background-image', `url(${img.src})`).on('mousemove touchmove', zoomController);
+        };
+
+        var scope, carouselElem, carousel,
             ngApp = angular.module('ngApp', [], function($interpolateProvider) {
                 $interpolateProvider.startSymbol('<%');
                 $interpolateProvider.endSymbol('%>');
             });
-
         ngApp.controller('ngCtrl', function($scope) {
             $scope.mediaPath = 'https://dash.sofieamoura.com/public/media/product';
             $scope.fn = NgFunctions;
@@ -224,6 +389,7 @@
             $scope.loading = false;
             $scope.submitting = false;
             $scope.list = [];
+            $scope.media = [];
             $scope.offset = 0;
             $scope.load = function(reload = false) {
                 if (reload) {
@@ -262,15 +428,15 @@
             $scope.viewProduct = function(ndx) {
                 if ($scope.submitting) return;
                 $scope.selectedProduct = ndx;
+                $scope.media = [];
                 $scope.colors = false;
                 productCanvas.show();
-                $.post('/products/sizes', {
+                $.post('/products/sizes_and_media', {
                     slug: $scope.list[$scope.selectedProduct].prodcolor_slug,
                     _token: '{{ csrf_token() }}'
                 }, function(data) {
                     var colors = {};
-                    $scope.sizes = data;
-                    $.map(data, function(item) {
+                    $.map(data.sizes, function(item) {
                         if (typeof colors[item.prodcolor_ref] == 'undefined')
                             colors[item.prodcolor_ref] = {
                                 info: item,
@@ -279,12 +445,38 @@
                         item.qty = 0;
                         colors[item.prodcolor_ref].sizes.push(item);
                     });
-                    scope.$apply(() => scope.colors = colors);
+                    scope.$apply(() => {
+                        scope.colors = colors;
+                        scope.sizes = data.sizes;
+                        scope.media = data.media;
+                    });
                     scope.$evalAsync(() => {
+                        carouselElem = document.querySelector('#carousel');
+                        carousel = new bootstrap.Carousel(carouselElem, {
+                            interval: 3000,
+                            wrap: true
+                        });
+
                         $('.prodsize-qty').on('focus', function(e) {
                             if ($(this).val() === '0') $(this).val('');
                         }).on('blur', function(e) {
                             if ($(this).val() === '') $(this).val('0');
+                        });
+
+                        $('.thumb-opt').on('click', function(e) {
+                            e.preventDefault();
+                            var indx = $('.thumb-opt').index(this);
+                            carousel.to(indx);
+                        });
+
+                        $('.carousel-item').on('click', function(e) {
+                            carousel.pause();
+                            $('.zoom_canvas').removeClass('d-none');
+                            $('.zoom_canvas')
+                                .css('background-position', `center`)
+                                .css('background-image', `url(${preloaderImg})`);
+                            $('#preview-area').fadeIn(150);
+                            img.src = $(this).data('image');
                         });
                     });
                 }, 'json')
@@ -397,12 +589,12 @@
                 });
                 scope.load(true);
             });
-        });
 
-        const validateEmail = email => {
-            return String(email).toLowerCase().match(
-                /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-            );
-        };
+            $('#preview-area .close-btn').on('click', function(e) {
+                e.preventDefault();
+                $('#preview-area').fadeOut(150);
+                $('.zoom_canvas').off();
+            });
+        });
     </script>
 @endsection

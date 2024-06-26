@@ -13,6 +13,8 @@ class Retailer extends Authenticatable
 
     public $timestamps = false;
     public $primaryKey = 'retailer_id';
+
+    protected $email = 'retailer_email';
     protected $fillable = [
         'retailer_code',
         'retailer_fullName',
