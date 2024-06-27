@@ -8,7 +8,7 @@
         <div class="row">
             <div class="col-12 col-sm-6">
                 <h5 class="text-center">Login</h5>
-                <div class="card border-0 m-auto">
+                <div class="card border-0 m-auto mb-5">
                     <div class="card-body">
                         @if ($errors->any())
                             <div class="text-danger pb-3">
@@ -138,6 +138,7 @@
             </div>
         </div>
     </div>
+
     <script>
         var scope,
             app = angular.module('ngApp', [], function($interpolateProvider) {

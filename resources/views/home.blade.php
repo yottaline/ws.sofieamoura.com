@@ -50,14 +50,14 @@
 
         #preview-area .zoom_canvas {
             /* margin: 20px;
-                                                                                                                                                                        padding: 10px; */
+                                                                                                                                                                                                padding: 10px; */
             background-repeat: no-repeat;
             background-position: 50%;
             cursor: crosshair;
             /* -webkit-transition: all 0.2s;
-                                                                                                                                                                        -moz-transition: all 0.2s;
-                                                                                                                                                                        -o-transition: all 0.2s;
-                                                                                                                                                                        transition: all 0.2s; */
+                                                                                                                                                                                                -moz-transition: all 0.2s;
+                                                                                                                                                                                                -o-transition: all 0.2s;
+                                                                                                                                                                                                transition: all 0.2s; */
         }
 
         #preview-area .close-btn {
@@ -98,17 +98,17 @@
         }
 
         /* a.thumb-opt:hover,
-                                                    a.thumb-opt:focus,
-                                                    a.thumb-opt:active,
-                                                    a.thumb-opt.active {
-                                                        border-color: #1d1d1d;
-                                                    } */
+                                                                            a.thumb-opt:focus,
+                                                                            a.thumb-opt:active,
+                                                                            a.thumb-opt.active {
+                                                                                border-color: #1d1d1d;
+                                                                            } */
 
         /* a.thumb-opt:hover>img,
-                                                    a.thumb-opt:focus>img,
-                                                    a.thumb-opt:active>img {
-                                                        opacity: .9
-                                                    } */
+                                                                            a.thumb-opt:focus>img,
+                                                                            a.thumb-opt:active>img {
+                                                                                opacity: .9
+                                                                            } */
 
         .thumb-opt>img {
             /* width: 100%; */
@@ -131,10 +131,8 @@
 
 @section('cart')
     <a href="" id="cartBtn" class="h6 m-0 d-inline-block link-secondary bi bi-cart3 me-1 p-2 position-relative">
-        @if (!empty($cart))
-            <span class="position-absolute translate-middle bg-danger border border-light rounded-circle"
-                style="right: -2px; top: 13px; padding: 5px"></span>
-        @endif
+        <span id='cartBadge' class="position-absolute translate-middle bg-danger border border-light rounded-circle"
+            style="right: -2px; top: 13px; padding: 5px"></span>
     </a>
     <script>
         var cartCanvas;
@@ -372,6 +370,9 @@
             zoom_canvas.css('background-position-x', `${xP}%`);
             zoom_canvas.css('background-position-y', `${yP}%`);
         }
+
+        const cartBadge = items => $('#cartBadge').toggle(+items)
+
         img.onload = function() {
             $('.zoom_canvas').css('background-image', `url(${img.src})`).on('mousemove touchmove', zoomController);
         };
@@ -381,6 +382,7 @@
                 $interpolateProvider.startSymbol('<%');
                 $interpolateProvider.endSymbol('%>');
             });
+
         ngApp.controller('ngCtrl', function($scope) {
             $scope.mediaPath = 'https://dash.sofieamoura.com/public/media/product';
             $scope.fn = NgFunctions;
@@ -418,6 +420,9 @@
                     });
                 }, 'json');
             }
+
+            $scope.draftOrder = {{ json_encode($order) }};
+            $scope.draftOrderProducts = {{ json_encode($orderProducts) }};
 
             // order = {prod_ref: {info: {}, sizes: [{info: {}, qty: n, total: n},], qty: n, total: n},}
             $scope.order = {};
@@ -527,6 +532,7 @@
                 } else if (Object.keys($scope.order).includes(product_ref))
                     delete($scope.order[product_ref]);
                 productCanvas.hide();
+                cartCanvas.show();
                 $scope.calOrderTotal();
             }
 
@@ -577,6 +583,7 @@
             }
 
             $scope.load();
+            cartBadge($scope.draftOrderProducts.length);
             scope = $scope;
         });
 

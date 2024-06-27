@@ -10,7 +10,6 @@ class Retailer_address extends Model
     use HasFactory;
 
     public $timestamps = false;
-
     protected $fillable = [
         'address_retailer',
         'address_type',
@@ -24,18 +23,18 @@ class Retailer_address extends Model
         'address_note'
     ];
 
-    public static function fetch($id = 0, $params = null)
+    static function fetch($id = 0, $params = null)
     {
-        $retailer_addresses = self::join('retailers', 'address_retailer', 'retailer_id')->join('locations', 'address_country', 'location_id');
+        $retailer_addresses = self::join('retailers', 'address_retailer', 'retailer_id')
+            ->join('locations', 'address_country', 'location_id');
 
         if ($params) $retailer_addresses->where($params);
-
         if ($id) $retailer_addresses->where('address_id', $id);
 
         return $id ? $retailer_addresses->first() : $retailer_addresses->get();
     }
 
-    public static function submit($param, $id = null)
+    static function submit($param, $id = null)
     {
         if ($id) return self::where('address_id', $id)->update($param) ? $id : false;
         $status = self::create($param);

@@ -41,11 +41,13 @@ class Retailer extends Authenticatable
         'retailer_created'
     ];
 
-    static function fetch($id)
+    static function fetch($id = 0, $params = null)
     {
         $retailers = self::join('locations', 'retailer_country', 'location_id')
-            ->join('currencies', 'retailer_currency', 'currency_id')
-            ->where('retailer_id', $id);
+            ->join('currencies', 'retailer_currency', 'currency_id');
+
+        if ($params) $retailers->where($params);
+        if ($id) $retailers->where('retailer_id', $id);
 
         return $retailers->first();
     }

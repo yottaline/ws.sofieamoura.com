@@ -22,9 +22,9 @@ class Location extends Model
 
     public static function fetch($id = 0, $params = null, $limit = null, $lastId = null)
     {
-        $locations = self::limit($limit)->orderBy('location_id', 'DESC');
+        $locations = self::limit($limit)->orderBy('location_id', 'ASC');
 
-        if($lastId) $locations->where('location_id', '<', $lastId);
+        if ($lastId) $locations->where('location_id', '<', $lastId);
 
         if (isset($params['q'])) {
             $locations->where(function (Builder $query) use ($params) {
@@ -37,9 +37,9 @@ class Location extends Model
             unset($params['q']);
         }
 
-        if($params) $locations->where($params);
+        if ($params) $locations->where($params);
 
-        if($id) $locations->where('location_id', $id);
+        if ($id) $locations->where('location_id', $id);
 
         return $id ? $locations->first() : $locations->get();
     }
