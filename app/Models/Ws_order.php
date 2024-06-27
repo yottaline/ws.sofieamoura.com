@@ -50,7 +50,8 @@ class Ws_order extends Model
 
     static function fetch($id = 0, $params = null, $limit = null, $lastId = null)
     {
-        $ws_orders = self::join('seasons', 'order_season', 'season_id')->join('retailers', 'order_retailer', 'retailer_id')
+        $ws_orders = self::join('seasons', 'order_season', 'season_id')
+            ->join('retailers', 'order_retailer', 'retailer_id')
             ->join('currencies', 'order_currency', 'currency_id');
 
         if ($limit) $ws_orders->limit($limit);

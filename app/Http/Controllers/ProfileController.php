@@ -26,16 +26,15 @@ class ProfileController extends Controller
     public function __construct(TelegramService $telegramService)
     {
         $this->telegramService = $telegramService;
+        //     $this->middleware('auth');
     }
-    // function __construct()
-    // {
-    //     $this->middleware('auth');
-    // }
 
     function index()
     {
-        $retailer = Retailer::fetch(auth()->user()->retailer_id);
-        return view('profile.index', compact('retailer'));
+        $info = Retailer::fetch(auth()->user()->retailer_id);
+        $addresses = Retailer_address::fetch(0, [['address_retailer', auth()->user()->retailer_id]]);
+        $locations = Location::fetch();
+        return view('profile.index', compact('info', 'addresses', 'locations'));
     }
 
     function update(Request $request)
@@ -109,4 +108,25 @@ class ProfileController extends Controller
         ]);
     }
 
+    function updateAddress(Request $request)
+    {
+        $retailer = Retailer::fetch(0, [['retailer_code', $request->retailer]]);
+        if (!$retailer) {
+            echo json_encode(['status' => false, 'message' => 'Retailer account is not defined']);
+            return;
+        }
+
+        $result = Retailer_address::submit([
+            'address_country'   => $request->country,
+            'address_province'  => $request->province,
+            'address_city'      => $request->city,
+            'address_zip'       => $request->zip,
+            'address_phone'     => $request->phone,
+            'address_line1'     => $request->line1,
+            'address_line2'     => $request->line2,
+            'address_note'      => $request->note,
+        ], $request->address);
+
+        echo json_encode(['status' => boolval($result)]);
+    }
 }

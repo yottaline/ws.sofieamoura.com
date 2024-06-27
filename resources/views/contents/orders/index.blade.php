@@ -8,27 +8,37 @@
                 @include('profile.side_bar')
             </div>
             <div class="col">
-                <div class="card card-box border">
-                    <div class="card-body">
-                        <h5 class="card-title fw-bold text-uppercase">Account Info</h5>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="container" data-ng-app="ngApp" data-ng-controller="ngCtrl">
-        <div class="row">
-            <div class="col-12 col-sm-4 col-lg-3">
-                @include('profile.side_bar')
-            </div>
-            <div class="col">
                 <div class="card card-box">
                     <div class="card-body">
-                        <h5 class="card-title fw-bold text-uppercase">Orders</h5>
+                        <h5 class="card-title fw-bold text-uppercase">Orders History</h5>
                         <div ng-if="list.length" class="table-responsive">
-                            <div ng-repeat="o in list">
-
-                            </div>
+                            <table class="table">
+                                <thead>
+                                    <tr class="text-center small">
+                                        <th width="80">code</th>
+                                        <th width="60">season</th>
+                                        <th width="120">total</th>
+                                        <th>status</th>
+                                        <th width="120">created</th>
+                                        <th width="120">placed</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="o in list" class="text-center small">
+                                        <td class="font-monospace" ng-bind="o.order_code"></td>
+                                        <td ng-bind="o.season_code"></td>
+                                        <td ng-bind="fn.sepNumber(o.order_total)"></td>
+                                        <td ng-bind="o.order_status"></td>
+                                        <td ng-bind="fn.slice(o.order_created, 0, 10)"></td>
+                                        <td ng-bind="o.order_placed ? fn.slice(o.order_placed, 0, 10) : '-'"></td>
+                                        <td class="col-fit">
+                                            <a href="/orders/view"
+                                                class="btn btn-outline-dark btn-circle bi bi-link-45deg"></a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                         @include('layouts.loader')
                     </div>

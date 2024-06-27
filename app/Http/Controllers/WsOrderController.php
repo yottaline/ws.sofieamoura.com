@@ -2,17 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Currency;
-use App\Models\Location;
 use App\Models\Retailer;
-use App\Models\Season;
 use App\Models\Ws_order;
 use App\Models\Ws_orders_product;
-use App\Models\Ws_product;
 use App\Models\Ws_products_size;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Hash;
 
 class WsOrderController extends Controller
 {
@@ -23,7 +18,7 @@ class WsOrderController extends Controller
 
     function index()
     {
-        return view('contents.wsOrders.index');
+        return view('contents.orders.index');
     }
 
     function load(Request $request)
@@ -32,7 +27,6 @@ class WsOrderController extends Controller
         $limit = $request->limit;
         $lastId = $request->last_id;
         if ($request->date)   $param[] = ['order_created', 'like', '%' . $request->date . '%'];
-        if ($request->r_name) $param[] = ['retailer_fullName', 'like', '%' . $request->r_name . '%'];
 
         echo json_encode(Ws_order::fetch(0, $param, $limit, $lastId));
     }
@@ -105,9 +99,9 @@ class WsOrderController extends Controller
 
     function view($code)
     {
-        $order = Ws_order::fetch($code);
+        $order = Ws_order::fetch(0, [['order_code', $code]]);
         $products = Ws_orders_product::fetch(0, [['ordprod_order', $order->order_id]]);
 
-        return view('contents.wsOrders.view', compact('order', 'products'));
+        return view('contents.orders.view', compact('order', 'products'));
     }
 }
