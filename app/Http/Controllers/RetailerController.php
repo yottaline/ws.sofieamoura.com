@@ -52,7 +52,7 @@ class RetailerController extends Controller
        * @return response()
        */
       public function showResetPasswordForm($token) {
-       $retailer = DB::table('password_reset_tokens')->where('token', $token);
-         return view('auth.reset-password', compact('retailer'));
+    //    $retailer = DB::table('password_reset_tokens')->where('token', $token);
+         return view('auth.reset-password', ['token' => $token]);
       }
 }
