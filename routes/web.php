@@ -14,6 +14,7 @@ Route::middleware('auth')->group(function () {
         Route::post('load', 'WsProductController@load');
         Route::post('sizes', 'WsProductsSizeController@load');
         Route::post('media', 'ProductsMediaController@load');
+        Route::post('sizes_and_media', 'WsProductController@sizesAndMedia');
     });
 
     Route::prefix('orders')->group(function () {
@@ -22,14 +23,18 @@ Route::middleware('auth')->group(function () {
         Route::post('submit', 'WsOrderController@submit');
         Route::get('view/{id}', 'WsOrderController@view');
     });
-
-    Route::get('profile', 'ProfileController@index');
-    Route::put('update', 'ProfileController@update');
-
+    Route::prefix('profile')->group(function () {
+        Route::get('/', 'ProfileController@index');
+        Route::put('update', 'ProfileController@update');
+        Route::get('orders', 'WsOrderController@index');
+        Route::get('order/{id}', 'WsOrderController@view');
+    });
 });
 
 
-// Route::get('test', 'ProfileController@test');
+Route::post('test', 'RetailerController@submitForgetPasswordForm')->name('forget.password.get');
+Route::get('reset-password/{token}', 'RetailerController@showResetPasswordForm')->name('reset.password.get');
+
 
 // Route::post('register_retailer', 'RetailerController@submit');
 

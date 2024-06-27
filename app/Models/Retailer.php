@@ -11,8 +11,11 @@ class Retailer extends Authenticatable
 {
     use HasFactory, HasFactory, Notifiable;
 
+    protected $table = 'retailers';
     public $timestamps = false;
     public $primaryKey = 'retailer_id';
+
+    public $email = 'retailer_email';
     protected $fillable = [
         'retailer_code',
         'retailer_fullName',
@@ -53,5 +56,10 @@ class Retailer extends Authenticatable
         if ($id) return self::where('retailer_id', $id)->update($param) ? $id : false;
         $status = self::create($param);
         return $status ? $status->id : false;
+    }
+
+    public function getEmailForPasswordReset()
+    {
+        return $this->retailer_email;
     }
 }

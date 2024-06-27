@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /.phpunit.cache
 /node_modules
 /public/build
@@ -12,6 +13,11 @@
 Homestead.json
 Homestead.yaml
 auth.json
+=======
+/.vscode/
+/vendor/
+node_modules/
+>>>>>>> 69ebb40987c1b194d21658839d3ba938cc89d10e
 npm-debug.log
 yarn-error.log
 /.fleet

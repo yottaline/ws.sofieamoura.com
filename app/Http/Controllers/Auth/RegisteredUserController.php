@@ -75,31 +75,30 @@ class RegisteredUserController extends Controller
         ];
 
         $result = Retailer::submit($param);
+        $message = "New Retailer Registered:\n"
+            . "Name: {$request->name}\n"
+            . "Company: {$request->company}\n"
+            . "Email: {$request->email}\n"
+            . "Phone: {$request->phone}\n"
+            . "Country: {$request->country}\n"
+            . "City: {$request->city}";
 
-        // if(boolval($result))
-        // {
-            $message = "New Retailer Registered:\n";
-            $message .= "Name: " . $request->name . "\n";
-            $message .= "Phone: " . $request->phone;
+        Http::post("https://api.telegram.org/bot7222495229:AAEJqA6pUj9xZIQDQ7AgsN_9O3rMNkk4dfg/sendMessage", [
+            'chat_id' => '-4232852781',
+            'text' => $message,
+            'reply_markup' => json_encode([
+                'inline_keyboard' => [[
+                    [
+                        'text' => 'Approved Request',
+                        'url' =>  "https://dash.sofieamoura.com/retailers/edit_approved?id={$result}",
+                    ]
+                ]]
+            ])
+        ]);
 
-            $data = [
-                'id' => $result,
-            ];
-
-            Http::post("https://api.telegram.org/bot7222495229:AAEJqA6pUj9xZIQDQ7AgsN_9O3rMNkk4dfg/sendMessage", [
-                'chat_id' => '-4232852781',
-                'text' => $message,
-                'reply_markup' => json_encode([
-                    'inline_keyboard' => [[
-                        ['text' => 'Approved Request', 'url' =>  "https://dash.sofieamoura.com/retailers/edit_approved", $data]
-                    ]]
-                ])
-            ]);
-        // }
         echo json_encode([
             'status' => boolval($request),
             'data'   => $result ? Retailer::fetch($result) : []
         ]);
     }
-
 }
