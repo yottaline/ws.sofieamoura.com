@@ -8,8 +8,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Carbon\Carbon;
-use App\Models\Retailer;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
 
@@ -17,50 +15,50 @@ use Illuminate\Support\Facades\DB;
 class RetailerController extends Controller
 {
 
-   /**
-       * Write code on Method
-       *
-       * @return response()
-       */
-      public function showForgetPasswordForm()
-      {
-         return view('auth.forgetPassword');
-      }
+    /**
+     * Write code on Method
+     *
+     * @return response()
+     */
+    public function showForgetPasswordForm()
+    {
+        return view('auth.forgetPassword');
+    }
 
-      /**
-       * Write code on Method
-       *
-       * @return response()
-       */
-      public function submitForgetPasswordForm(Request $request)
-      {
+    /**
+     * Write code on Method
+     *
+     * @return response()
+     */
+    public function submitForgetPasswordForm(Request $request)
+    {
         $retailer = Retailer::where('retailer_email', $request->retailer_email)->first();
-        if(!$retailer) return back()->with('message', 'You not have account');
-        
-          $token =  uniqidReal(20);
-          DB::table('password_reset_tokens')->insert([
-              'email' => $request->retailer_email,
-              'token' => $token,
-              'created_at' => Carbon::now()
-            ]);
+        if (!$retailer) return back()->with('message', 'You not have account');
 
-          Mail::send('email.forgetPassword', ['token' => $token], function($message) use($request){
-              $message->to($request->retailer_email);
-              $message->subject('Reset Password');
-          });
+        $token =  uniqidReal(20);
+        DB::table('password_reset_tokens')->insert([
+            'email' => $request->retailer_email,
+            'token' => $token,
+            'created_at' => Carbon::now()
+        ]);
 
-          return back()->with('message', 'We have e-mailed your password reset link!');
-      }
-      /**
-       * Write code on Method
-       *
-       * @return response()
-       */
-      public function showResetPasswordForm($token) {
-    //    $retailer = DB::table('password_reset_tokens')->where('token', $token);
-         return view('auth.reset-password', ['token' => $token]);
-      }
-}
+        Mail::send('email.forgetPassword', ['token' => $token], function ($message) use ($request) {
+            $message->to($request->retailer_email);
+            $message->subject('Reset Password');
+        });
+
+        return back()->with('message', 'We have e-mailed your password reset link!');
+    }
+    /**
+     * Write code on Method
+     *
+     * @return response()
+     */
+    public function showResetPasswordForm($token)
+    {
+        //    $retailer = DB::table('password_reset_tokens')->where('token', $token);
+        return view('auth.reset-password', ['token' => $token]);
+    }
 
     function request(Request $request)
     {
@@ -95,14 +93,41 @@ class RetailerController extends Controller
             'retailer_phone'        => $phone,
             'retailer_password'     => Hash::make('0000'),
             'retailer_company'      => $request->company,
+            'retailer_store'        => $request->store,
+            'retailer_vat'          => $request->vat,
             'retailer_country'      => $request->country,
             'retailer_province'     => '',
-            'retailer_city'         => '',
+            'retailer_city'         => $request->city,
             'retailer_zip'          => '',
-            'retailer_address'      => '',
+            'retailer_website'      => $request->website,
+            'retailer_billAddress'  => $request->billing,
+            'retailer_shipAddress'  => $request->delivery,
             'retailer_currency'     => 1,
             'retailer_created'      => Carbon::now()
         ];
+
+        $addresses = [[
+            'address_type' => '1',
+            'address_country',
+            'address_province',
+            'address_city',
+            'address_zip',
+            'address_line1' => $request->billing,
+            'address_line2',
+            'address_phone',
+            'address_note',
+        ], [
+            'address_type',
+            'address_country' => '1',
+            'address_province',
+            'address_city',
+            'address_zip',
+            'address_line1' => $request->delivery,
+            'address_line2',
+            'address_phone',
+            'address_note',
+        ]];
+        // TODO: add addresses
 
         $result = Retailer::submit($param);
         $message = "Nouveau détaillant enregistré:\n"
@@ -138,4 +163,3 @@ class RetailerController extends Controller
         // ]);
     }
 }
-
