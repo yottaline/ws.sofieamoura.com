@@ -27,81 +27,161 @@ class WsOrderController extends Controller
         $limit = $request->limit;
         $lastId = $request->last_id;
         if ($request->date)   $param[] = ['order_created', 'like', '%' . $request->date . '%'];
-
+        $param[] = ['order_retailer', auth()->user()->retailer_id];
         echo json_encode(Ws_order::fetch(0, $param, $limit, $lastId));
     }
 
-    function submit(Request $request)
+    function add(Request $request)
     {
-        $ids = explode(',', $request->sizes);
-        $qty = explode(',', $request->qty);
+        $retailer = auth()->user()->retailer_id;
 
-        $retailer = Retailer::fetch(auth()->user()->retailer_id);
-        $ordSubtotal = $orderTotalDisc = $ordTotal = 0;
+        $ids = explode(',', $request->sizes);
+        $qtys = explode(',', $request->qtys);
+
         $products  = Ws_products_size::fetch(0, null, $ids);
-        foreach ($products as $p) {
-            $indx = array_search($p->prodsize_id, $ids);
-            if ($indx !== false) {
-                $subtotal = $qty[$indx] * $p->prodsize_wsp;
-                // $total    = $subtotal * $disc[$indx] / 100;
-                $orderProductParam[] = [
-                    'ordprod_product'       => $p->product_id,
-                    'ordprod_size'          => $p->prodsize_id,
-                    'ordprod_price'         => $p->prodsize_wsp,
-                    'ordprod_request_qty'   => $qty[$indx],
-                    'ordprod_subtotal'      => $subtotal,
-                    'ordprod_total'         => $subtotal,
-                    'ordprod_discount'      => 0,
-                    'ordprod_served_qty'    => $qty[$indx]
-                ];
-                $ordSubtotal    += $subtotal;
-                $ordTotal       += $subtotal;
+        $order = Ws_order::fetch(0, [
+            ['order_retailer', $retailer],
+            ['order_status', '0'],
+        ]);
+        if (!count($order)) {
+            $order = Ws_order::createOrder([
+                'order_code'          => uniqidReal(10),
+                'order_season'        => 1,
+                'order_currency'      => 1,
+                'order_type'          => 1,
+                'order_created'       => Carbon::now(),
+                'order_retailer'      => $retailer,
+            ]);
+            if (!$order) {
+                echo json_encode(['status' => false, 'message' => 'Error on creating a new order']);
+                return;
             }
+        } else {
+            $order = $order[0]->order_id;
         }
 
-        $orderParam = [
-            'order_code'          => uniqidReal(10),
-            'order_season'        => 1,
-            'order_shipping'      => 0,
-            'order_subtotal'      => $ordSubtotal,
-            'order_discount'      => 0,
-            'order_total'         => $ordTotal,
-            'order_currency'      => 1,
-            'order_type'          => 1,
-            'order_note'          => $request->note,
-            'order_created'       => Carbon::now(),
-            'order_proforma'      => uniqidReal(20),
-            'order_proformatime'  => Carbon::now(),
-            'order_invoice'       => uniqidReal(30),
-            'order_invoicetime'   => Carbon::now(),
-            'order_status'        => 0,
-            'order_retailer'      => $retailer->retailer_id,
-            'order_bill_country'  => $retailer->retailer_country,
-            'order_bill_province' => $retailer->retailer_province,
-            'order_bill_city'     => $retailer->retailer_city,
-            'order_bill_zip'      => $retailer->retailer_zip,
-            'order_bill_line1'    => $retailer->retailer_address,
-            // 'order_bill_line2'    => $retailer->retailer_city,
-            'order_bill_phone'    => $retailer->retailer_phone,
-            'order_ship_country'  => $retailer->retailer_country,
-            'order_ship_province' => $retailer->retailer_province,
-            'order_ship_city'     => $retailer->retailer_city,
-            'order_ship_zip'      => $retailer->retailer_zip,
-            'order_ship_line1'    => $retailer->retailer_address,
-            // 'order_ship_line2'    => $retailer->retailer_city,
-            'order_ship_phone'    => $retailer->retailer_phone,
-        ];
+        $ordProducts  = Ws_orders_product::fetch(0, [['order_id', $order]])->toArray();
+        $ordProductsSizes = count($ordProducts) ? array_column($ordProducts, 'prodsize_id') : [];
 
-        $result = Ws_order::submit(0, $orderParam, $orderProductParam);
-        if ($result['status']) $result['data'] = Ws_order::fetch($result['id']);
-        echo json_encode($result);
+        $removeParam = $addParam = [];
+        foreach ($products as $p) {
+            $indx = array_search($p->prodsize_id, $ids);
+            if (in_array($p->prodsize_id, $ordProductsSizes)) {
+                $removeParam[] = $p->prodsize_id;
+            }
+            if ($qtys[$indx]) {
+                $subtotal = $qtys[$indx] * $p->prodsize_wsp;
+                $addParam[] = [
+                    'ordprod_order' => $order,
+                    'ordprod_product' => $p->product_id,
+                    'ordprod_color' => $p->prodcolor_id,
+                    'ordprod_size' => $p->prodsize_id,
+                    'ordprod_price' => $p->prodsize_wsp,
+                    'ordprod_request_qty' => $qtys[$indx],
+                    'ordprod_served_qty' => $qtys[$indx],
+                    'ordprod_subtotal' => $subtotal,
+                    'ordprod_total' => $subtotal,
+                ];
+            }
+        }
+        $status = Ws_orders_product::addRemove($addParam, $order, $removeParam);
+        if (!$status) {
+            echo json_encode(['status' => false, 'message' => 'Error on adding products']);
+            return;
+        }
+        $t = $this->updateOrderTotals($order);
+        echo json_encode([
+            'status' => true,
+            'order' => Ws_order::fetch($order),
+            'products' => Ws_orders_product::fetch(0, [['order_id', $order]]),
+        ]);
+    }
+
+    function remove(Request $request)
+    {
+        $status = Ws_orders_product::remove($request->product);
+        if ($status) {
+            $t = $this->updateOrderTotals($request->order);
+            echo json_encode([
+                'status' => true,
+                'order' => Ws_order::fetch($request->order),
+                'products' => Ws_orders_product::fetch(0, [['order_id', $request->order]]),
+            ]);
+        } else {
+            echo json_encode([
+                'status' => false,
+                'message' => 'Error in removing the product!'
+            ]);
+        }
+    }
+
+    private function updateOrderTotals($id)
+    {
+        $ordSubtotal = $ordTotal = 0;
+        $ordProducts  = Ws_orders_product::fetch(0, [['order_id', $id]]);
+        foreach ($ordProducts as $product) {
+            $ordSubtotal += $product->ordprod_subtotal;
+            $ordTotal += $product->ordprod_total;
+        }
+
+        return Ws_order::updateOrder($id, [
+            'order_subtotal' => $ordSubtotal,
+            'order_total' => $ordTotal,
+        ]);
     }
 
     function view($code)
     {
-        $order = Ws_order::fetch(0, [['order_code', $code]]);
+        $order = Ws_order::fetch(0, [['order_code', $code]])[0];
         $products = Ws_orders_product::fetch(0, [['ordprod_order', $order->order_id]]);
 
         return view('contents.orders.view', compact('order', 'products'));
+    }
+
+    function updateQty(Request $request)
+    {
+
+        if ($request->qty) {
+            $product = Ws_orders_product::fetch($request->product);
+            $subtotal = $request->qty * $product->prodsize_wsp;
+            $status = Ws_orders_product::updateProduct($request->product, [
+                'ordprod_price' => $product->prodsize_wsp,
+                'ordprod_request_qty' => $request->qty,
+                'ordprod_served_qty' => $request->qty,
+                'ordprod_subtotal' => $subtotal,
+                'ordprod_total' => $subtotal,
+            ]);
+        } else {
+            $status = Ws_orders_product::remove($request->product);
+        }
+
+        if ($status) {
+            $t = $this->updateOrderTotals($request->order);
+            echo json_encode([
+                'status' => true,
+                'order' => Ws_order::fetch($request->order),
+                'products' => Ws_orders_product::fetch(0, [['order_id', $request->order]]),
+            ]);
+        } else {
+            echo json_encode([
+                'status' => false,
+                'message' => 'Error in removing the product!'
+            ]);
+        }
+    }
+
+    function updateStatus(Request $request)
+    {
+        $param = [
+            'order_status' => $request->status,
+            'order_note' => $request->note,
+        ];
+        if ($request->status == 2) $param['order_placed'] = Carbon::now();
+
+        $result =  Ws_order::submit($request->order, $param);
+        echo json_encode([
+            'status'  => boolval($result),
+            'data'    => $result ? Ws_order::fetch($request->order) : []
+        ]);
     }
 }

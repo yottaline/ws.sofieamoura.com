@@ -15,9 +15,9 @@
                             <table class="table">
                                 <thead>
                                     <tr class="text-center small">
-                                        <th width="80">code</th>
+                                        <th width="90">code</th>
                                         <th width="60">season</th>
-                                        <th width="120">total</th>
+                                        <th width="140">total</th>
                                         <th>status</th>
                                         <th width="120">created</th>
                                         <th width="120">placed</th>
@@ -29,11 +29,11 @@
                                         <td class="font-monospace" ng-bind="o.order_code"></td>
                                         <td ng-bind="o.season_code"></td>
                                         <td ng-bind="fn.sepNumber(o.order_total)"></td>
-                                        <td ng-bind="o.order_status"></td>
+                                        <td ng-bind="statusObject.name[o.order_status]"></td>
                                         <td ng-bind="fn.slice(o.order_created, 0, 10)"></td>
                                         <td ng-bind="o.order_placed ? fn.slice(o.order_placed, 0, 10) : '-'"></td>
                                         <td class="col-fit">
-                                            <a href="/orders/view"
+                                            <a href="/orders/view/<% o.order_code %>"
                                                 class="btn btn-outline-dark btn-circle bi bi-link-45deg"></a>
                                         </td>
                                     </tr>
@@ -58,6 +58,13 @@
 
         ngApp.controller('ngCtrl', function($scope) {
             $scope.fn = NgFunctions;
+            $scope.statusObject = {
+                name: [
+                    'Draft', 'Canceled', 'Placed',
+                    'Confirmed', 'Advance Payment Is Pending',
+                    'Balance Payment Is Pending', 'Shipped'
+                ],
+            };
             $scope.noMore = false;
             $scope.loading = false;
             $scope.submitting = false;
@@ -90,7 +97,7 @@
                 }, 'json');
             }
 
-            // $scope.load();
+            $scope.load();
             scope = $scope;
         });
     </script>

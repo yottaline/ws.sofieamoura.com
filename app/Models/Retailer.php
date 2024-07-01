@@ -55,7 +55,7 @@ class Retailer extends Authenticatable
 
     static function submit($param, $id = null)
     {
-        if ($id) return self::where('retailer_id', $id)->update($param) ? $id : false;
+        if ($id) self::where('retailer_id', $id)->update($param) ? $id : false;
         $status = self::create($param);
         return $status ? $status->id : false;
     }
