@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Retailer_address;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
 
@@ -75,17 +76,6 @@ class RetailerController extends Controller
             return redirect('https://sofieamoura.com/request_sent.php');
         }
 
-        // if (count(Retailer::where('retailer_phone', $phone)->get())) {
-        //     echo json_encode(['status' => false, 'message' => __('Ce numéro de téléphone est déjà enregistré'),]);
-        //     return;
-        // }
-
-
-        // if ($email &&  count(Retailer::where('retailer_email', $email)->get())) {
-        //     echo json_encode(['status' => false, 'message' => __('cette adresse email est déjà enregistrée'),]);
-        //     return;
-        // }
-
         $param = [
             'retailer_code'         => uniqidReal(8),
             'retailer_fullName'     => $request->name . ',' . $request->first_name,
@@ -106,30 +96,31 @@ class RetailerController extends Controller
             'retailer_created'      => Carbon::now()
         ];
 
-        $addresses = [[
-            'address_type' => '1',
-            'address_country',
-            'address_province',
-            'address_city',
-            'address_zip',
-            'address_line1' => $request->billing,
-            'address_line2',
-            'address_phone',
-            'address_note',
-        ], [
-            'address_type',
-            'address_country' => '1',
-            'address_province',
-            'address_city',
-            'address_zip',
-            'address_line1' => $request->delivery,
-            'address_line2',
-            'address_phone',
-            'address_note',
-        ]];
-        // TODO: add addresses
-
         $result = Retailer::submit($param);
+        $addresses = [[
+            'address_retailer'  => $result,
+            'address_type'      => 1,
+            'address_country'   => $request->country,
+            'address_province'  => '',
+            'address_city'      => $request->city,
+            'address_zip'       => '',
+            'address_line1'     => $request->billing,
+            'address_line2'     => '',
+            'address_phone'     => $phone,
+            'address_note'      => '',
+        ], [
+            'address_retailer'  => $result,
+            'address_type'    => 2,
+            'address_country' => $request->country,
+            'address_province' => '',
+            'address_city'    => $request->city,
+            'address_zip'     => '',
+            'address_line1'   => $request->delivery,
+            'address_line2'   => '',
+            'address_phone'   => $phone,
+            'address_note'    => '',
+        ]];
+        Retailer_address::insert($addresses);
         $message = "Nouveau détaillant enregistré:\n"
             . "Nom: {$request->name}\n"
             . "Prénom: {$request->first_name}\n"
@@ -156,10 +147,5 @@ class RetailerController extends Controller
         ]);
 
         return redirect('https://sofieamoura.com/request_sent.php');
-
-        // echo json_encode([
-        //     'status' => boolval($request),
-        //     'data'   => $result ? Retailer::fetch($result) : []
-        // ]);
     }
 }
