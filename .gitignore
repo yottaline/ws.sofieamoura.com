@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 /.phpunit.cache
 /node_modules
 /public/build
@@ -6,6 +6,7 @@
 /public/storage
 /storage/*.key
 /vendor
+.DS_store
 .env
 .env.backup
 .env.production
@@ -13,11 +14,7 @@
 Homestead.json
 Homestead.yaml
 auth.json
-=======
-/.vscode/
-/vendor/
-node_modules/
->>>>>>> 69ebb40987c1b194d21658839d3ba938cc89d10e
+
 npm-debug.log
 yarn-error.log
 /.fleet
