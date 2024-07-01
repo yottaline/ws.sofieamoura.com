@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Retailer;
+use App\Mail\OrderPlaced;
+use App\Models\Location;
+use Illuminate\Support\Facades\Mail;
+use App\Models\Retailer_address;
 use App\Models\Ws_order;
 use App\Models\Ws_orders_product;
 use App\Models\Ws_products_size;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class WsOrderController extends Controller
 {
@@ -133,9 +137,11 @@ class WsOrderController extends Controller
     function view($code)
     {
         $order = Ws_order::fetch(0, [['order_code', $code]])[0];
+        $addresses = Retailer_address::where('address_retailer', $order->order_retailer)->get();
         $products = Ws_orders_product::fetch(0, [['ordprod_order', $order->order_id]]);
+        $locations = Location::fetch();
 
-        return view('contents.orders.view', compact('order', 'products'));
+        return view('contents.orders.view', compact('order', 'products', 'addresses', 'locations'));
     }
 
     function updateQty(Request $request)
@@ -176,12 +182,52 @@ class WsOrderController extends Controller
             'order_status' => $request->status,
             'order_note' => $request->note,
         ];
-        if ($request->status == 2) $param['order_placed'] = Carbon::now();
+        $placed = Carbon::now();
+        $paramBill = [
+            'address_retailer'  => $request->bill_retailer,
+            'address_country'   => $request->billCountry,
+            'address_province'  => $request->billProvince,
+            'address_city'      => $request->billCity,
+            'address_zip'       => $request->billCity,
+            'address_line1'     => $request->billLine1,
+            'address_line2'     => $request->billLine2,
+            'address_phone'     => $request->billPhone,
+            'address_note'      =>  $request->billNote ?? '',
+        ];
+        $paramShipping = [
+            'address_retailer'  => $request->shipp_retailer,
+            'address_country'   => $request->shippingCountry,
+            'address_province'  => $request->shhingProvince,
+            'address_city'      => $request->shippinfCity,
+            'address_zip'       => $request->shippingZip,
+            'address_line1'     => $request->shippingLine1,
+            'address_line2'     => $request->shippingLine2,
+            'address_phone'     => $request->shippingPhone,
+            'address_note'      =>  $request->shippingNote ?? '',
+        ];
+        if ($request->status == 2) $param['order_placed'] = $placed;
 
-        $result =  Ws_order::submit($request->order, $param);
-        echo json_encode([
-            'status'  => boolval($result),
-            'data'    => $result ? Ws_order::fetch($request->order) : []
-        ]);
+        try {
+            DB::beginTransaction();
+            $result =  Ws_order::submit($request->order, $param);
+            Retailer_address::where('address_retailer',  $request->bill_retailer)->where('address_type', 1)->update($paramBill);
+            Retailer_address::where('address_retailer',  $request->bill_retailer)->where('address_type', 2)->update($paramShipping);
+
+            $order =  Ws_order::fetch($request->order);
+            Mail::to('b2b@sofieamoura.com')->send(new OrderPlaced($order->order_code, $placed, $order));
+            DB::commit();
+
+
+
+            echo json_encode([
+                'status'  => boolval($result),
+                'data'    => $result ? $order : []
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return ['status' => false, 'message' => 'error: ' . $e->getMessage()];
+        }
+
+
     }
 }
