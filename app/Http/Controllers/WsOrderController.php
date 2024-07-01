@@ -12,6 +12,7 @@ use App\Models\Ws_products_size;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class WsOrderController extends Controller
 {
@@ -178,6 +179,7 @@ class WsOrderController extends Controller
 
     function updateStatus(Request $request)
     {
+
         $param = [
             'order_status' => $request->status,
             'order_note' => $request->note,
@@ -214,7 +216,7 @@ class WsOrderController extends Controller
             Retailer_address::where('address_retailer',  $request->bill_retailer)->where('address_type', 2)->update($paramShipping);
 
             $order =  Ws_order::fetch($request->order);
-            Mail::to('b2b@sofieamoura.com')->send(new OrderPlaced($order->order_code, $placed, $order));
+            Http::timeout(100)->get('http://127.0.0.1:8002/ws_orders/get_confirmed/'. $order->order_id);
             DB::commit();
 
 
