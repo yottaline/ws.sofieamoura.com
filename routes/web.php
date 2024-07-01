@@ -4,8 +4,9 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Http;
 
-Route::post('locations/load', 'LocationController@load');
-Route::get('account/request', fn () => view('contents.profile.request'));
+// Route::get('account/request', fn () => view('contents.profile.request'));
+Route::match(['post', 'get'], 'locations/load', 'LocationController@load');
+Route::get('join/request', 'RetailerController@request');
 Route::middleware('auth')->group(function () {
     Route::get('/', 'HomeController@index');
 
@@ -20,7 +21,10 @@ Route::middleware('auth')->group(function () {
     Route::prefix('orders')->group(function () {
         Route::get('/', 'WsOrderController@index');
         Route::post('load', 'WsOrderController@load');
-        Route::post('submit', 'WsOrderController@submit');
+        Route::post('add', 'WsOrderController@add');
+        Route::post('update_status', 'WsOrderController@updateStatus');
+        Route::post('update_qty', 'WsOrderController@updateQty');
+        Route::post('remove', 'WsOrderController@remove');
         Route::get('view/{code}', 'WsOrderController@view');
     });
 

@@ -82,4 +82,15 @@ class Ws_order extends Model
             return ['status' => false, 'message' => 'error: ' . $e->getMessage()];
         }
     }
+
+    static function createOrder($param)
+    {
+        $status = self::create($param);
+        return $status ? $status->id : false;
+    }
+
+    static function updateOrder($id, $param)
+    {
+        $status = self::where('order_id', $id)->update($param);
+    }
 }
