@@ -30,7 +30,7 @@ class PasswordResetLinkController extends Controller
         ]);
 
         $status = Password::broker('retailers')->sendResetLink(
-            $request->only('retailer_email')
+            ['retailer_email' => $request->retailer_email]
         );
 
         return $status == Password::RESET_LINK_SENT

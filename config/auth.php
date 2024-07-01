@@ -15,7 +15,7 @@ return [
 
     'defaults' => [
         'guard' => 'web',
-        'passwords' => 'users',
+        'passwords' => 'retailers',
     ],
 
     /*
@@ -38,7 +38,7 @@ return [
     'guards' => [
         'web' => [
             'driver' => 'session',
-            'provider' => 'users',
+            'provider' => 'retailers',
         ],
     ],
 
@@ -60,7 +60,7 @@ return [
     */
 
     'providers' => [
-        'users' => [
+        'retailers' => [
             'driver' => 'eloquent',
             'model' => App\Models\Retailer::class,
         ],
@@ -99,7 +99,9 @@ return [
         // ],
         'retailers' => [
             'provider' => 'retailers',
-            'table' => 'password_resets',
+            'table' => 'password_reset_tokens',
+            'email' => 'retailer_email', // Field name used for password reset
+            'connection' => 'your_database_connection',
             'expire' => 60,
         ],
     ],

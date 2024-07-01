@@ -8,15 +8,21 @@
                 </div>
 
                 <!-- Session Status -->
-                <x-auth-session-status class="mb-4" :status="session('status')" />
+                {{-- <x-auth-session-status class="mb-4" :status="session('status')" /> --}}
 
-                <form method="post" action="{{ route('password.email') }}">
+                @if (Session::has('message'))
+                    <div class="alert alert-success" role="alert">
+                        {{ Session::get('message') }}
+                    </div>
+                @endif
+
+                <form method="post" action="{{ route('forget.password.get') }}">
                     @csrf
                     <div class="mb-3">
                         <x-input-label for="email" :value="__('Email')" />
-                        <x-text-input id="email" class="form-control mt-1" type="email" name="email"
-                            :value="old('email')" required autofocus />
-                        <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                        <x-text-input id="email" class="form-control mt-1" type="email" name="retailer_email"
+                            :value="old('retailer_email')" required autofocus />
+                        <x-input-error :messages="$errors->get('retailer_email')" class="mt-2" />
                     </div>
 
                     <div class="text-center">
@@ -27,4 +33,5 @@
             </div>
         </div>
     </div>
+
 </x-guest-layout>

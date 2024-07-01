@@ -36,7 +36,9 @@ Route::middleware('auth')->group(function () {
 });
 
 
-// Route::get('test', 'ProfileController@test');
+Route::post('test', 'RetailerController@submitForgetPasswordForm')->name('forget.password.get');
+Route::get('reset-password/{token}', 'RetailerController@showResetPasswordForm')->name('reset.password.get');
+
 // Route::post('register_retailer', 'RetailerController@submit');
 // Route::middleware('auth')->group(function () {
 //     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

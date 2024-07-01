@@ -8,7 +8,7 @@ use Illuminate\Auth\Passwords\PasswordBroker;
 
 class CustomPasswordResetServiceProvider extends ServiceProvider
 {
-    function register()
+    public function register()
     {
         $this->app->singleton('auth.password.broker', function ($app) {
             return new PasswordBrokerManager($app);
@@ -17,10 +17,5 @@ class CustomPasswordResetServiceProvider extends ServiceProvider
         $this->app->bind('auth.password.broker.retailer', function ($app) {
             return $app->make('auth.password')->broker('retailer');
         });
-    }
-
-    function boot(): void
-    {
-        //
     }
 }
