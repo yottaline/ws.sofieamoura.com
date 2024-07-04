@@ -2,7 +2,7 @@
 @section('title', 'Orders History')
 
 @section('content')
-    <div class="container" data-ng-app="ngApp" data-ng-controller="ngCtrl">
+    <div class="container-fluid" data-ng-app="ngApp" data-ng-controller="ngCtrl">
         <div class="row">
             <div class="col-12 col-sm-4 col-lg-3">
                 @include('profile.side_bar')

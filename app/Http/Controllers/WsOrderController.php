@@ -147,7 +147,6 @@ class WsOrderController extends Controller
 
     function updateQty(Request $request)
     {
-
         if ($request->qty) {
             $product = Ws_orders_product::fetch($request->product);
             $subtotal = $request->qty * $product->prodsize_wsp;
@@ -179,57 +178,49 @@ class WsOrderController extends Controller
 
     function updateStatus(Request $request)
     {
+        $order =  Ws_order::fetch($request->order);
+        if (!$order || $order->order_status != 0) {
+            echo json_encode([
+                'status'  => false,
+                'message' => "The order status is already updated. Please reload the page!"
+            ]);
+            return;
+        }
 
         $param = [
             'order_status' => $request->status,
             'order_note' => $request->note,
         ];
-        $placed = Carbon::now();
-        $paramBill = [
-            'address_retailer'  => $request->bill_retailer,
-            'address_country'   => $request->billCountry,
-            'address_province'  => $request->billProvince,
-            'address_city'      => $request->billCity,
-            'address_zip'       => $request->billCity,
-            'address_line1'     => $request->billLine1,
-            'address_line2'     => $request->billLine2,
-            'address_phone'     => $request->billPhone,
-            'address_note'      =>  $request->billNote ?? '',
-        ];
-        $paramShipping = [
-            'address_retailer'  => $request->shipp_retailer,
-            'address_country'   => $request->shippingCountry,
-            'address_province'  => $request->shhingProvince,
-            'address_city'      => $request->shippinfCity,
-            'address_zip'       => $request->shippingZip,
-            'address_line1'     => $request->shippingLine1,
-            'address_line2'     => $request->shippingLine2,
-            'address_phone'     => $request->shippingPhone,
-            'address_note'      =>  $request->shippingNote ?? '',
-        ];
-        if ($request->status == 2) $param['order_placed'] = $placed;
-
-        try {
-            DB::beginTransaction();
-            $result =  Ws_order::submit($request->order, $param);
-            Retailer_address::where('address_retailer',  $request->bill_retailer)->where('address_type', 1)->update($paramBill);
-            Retailer_address::where('address_retailer',  $request->bill_retailer)->where('address_type', 2)->update($paramShipping);
-
-            $order =  Ws_order::fetch($request->order);
-            Http::timeout(100)->get('http://127.0.0.1:8002/ws_orders/get_confirmed/'. $order->order_id);
-            DB::commit();
-
-
-
-            echo json_encode([
-                'status'  => boolval($result),
-                'data'    => $result ? $order : []
-            ]);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return ['status' => false, 'message' => 'error: ' . $e->getMessage()];
+        if ($request->status == 2) {
+            $param['order_placed'] = Carbon::now();
+            $billUpdateStatus = Retailer_address::submit([
+                'address_country'   => $request->bill_country,
+                'address_city'      => $request->bill_city,
+                'address_zip'       => $request->bill_zip,
+                'address_line1'     => $request->bill_line1,
+                'address_line2'     => $request->bill_line2,
+                'address_phone'     => $request->bill_phone,
+                'address_note'      => $request->bill_note,
+            ], $request->bill_address);
+            $shipUpdateStatus = Retailer_address::submit([
+                'address_country'   => $request->ship_country,
+                'address_city'      => $request->ship_city,
+                'address_zip'       => $request->ship_zip,
+                'address_line1'     => $request->ship_line1,
+                'address_line2'     => $request->ship_line2,
+                'address_phone'     => $request->ship_phone,
+                'address_note'      => $request->ship_note,
+            ], $request->ship_address);
         }
 
-
+        $result =  Ws_order::updateOrder($request->order, $param);
+        if ($result && $request->status == 2) {
+            $order =  Ws_order::fetch($request->order);
+            Http::timeout(1000)->get('https://dash.sofieamoura.com/ws_orders/get_confirmed/' . $order->order_id);
+        }
+        echo json_encode([
+            'status'  => $result,
+            'data'    => $result ? $order : []
+        ]);
     }
 }

@@ -91,6 +91,6 @@ class Ws_order extends Model
 
     static function updateOrder($id, $param)
     {
-        $status = self::where('order_id', $id)->update($param);
+        return self::where('order_id', $id)->update($param);
     }
 }

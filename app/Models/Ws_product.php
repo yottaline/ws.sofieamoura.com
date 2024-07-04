@@ -24,6 +24,7 @@ class Ws_product extends Model
             ->join('products_media', 'prodcolor_media', 'media_id')
             ->orderBy('prodcolor_order', 'ASC')
             ->orderBy('product_id', 'ASC')
+            ->where('prodcolor_published', '1')
             ->limit($limit)->offset($offset)->groupBy('prodcolor_slug');
 
         if (isset($params['q'])) {

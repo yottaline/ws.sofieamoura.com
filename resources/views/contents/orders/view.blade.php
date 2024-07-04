@@ -38,8 +38,8 @@
                                 {{-- <a href="" class="link-danger h5 bi bi-x"
                                     ng-click="delProduct(p.info.product_id)"></a> --}}
                             </div>
-                            <p class="text-danger small fw-bold" ng-if="p.qty < 6">
-                                <i class="bi bi-info-circle me-1"></i><span>Minimum order qty 6</span>
+                            <p class="text-danger small fw-bold" ng-if="p.qty < min_qty">
+                                <i class="bi bi-info-circle me-1"></i><span>Minimum order qty <% min_qty %></span>
                             </p>
                             <div class="table-responsive">
                                 <table class="table table-hover sizes-table">
@@ -91,231 +91,238 @@
             <div class="col order-lg-first">
                 <div class="card card-box">
                     <div class="card-body product-block">
-                        <h6 class="fw-semibold text-uppercase">
-                            <span>ORDER</span> <span><% order.order_code %></span>
-                        </h6>
-                        <h6 class="small"><% order.season_name %></h6>
-                        <span class="text-primary"><% statusObject.name[order.order_status] %></span>
-                        <p class="text-secondary mb-0 small">created: <span class="font-monospace"
-                                ng-bind="fn.slice(order.order_created, 0, 16)"></span></p>
-                        <p class="text-secondary mb-0 small" ng-if="order.order_placed">placed: <span class="font-monospace"
-                                ng-bind="fn.slice(order.order_placed, 0, 16)"></span></p>
-                        <hr>
-                        <div class="co-12">
-                            <h6>
-                                <span class="text-uppercase">Billing Address</span>
-                            </h6>
+                        <form id="orderForm">
+                            <div class="mb-3">
+                                <h6 class="fw-semibold text-uppercase">
+                                    <span>ORDER</span> #<span ng-bind="order.order_code"></span>
+                                </h6>
+                                <h6 class="small" ng-bind="order.season_name"></h6>
+                                <span class="text-primary fw-bold" ng-bind="statusObject.name[order.order_status]"></span>
+                                <p class="text-secondary mb-0 small">created: <span class="font-monospace"
+                                        ng-bind="fn.slice(order.order_created, 0, 16)"></span></p>
+                                <p class="text-secondary mb-0 small" ng-if="order.order_status == 0 && order.order_placed">
+                                    placed: <span class="font-monospace"
+                                        ng-bind="fn.slice(order.order_placed, 0, 16)"></span></p>
+                            </div>
+
                             @foreach ($addresses as $a)
                                 @if ($a->address_type == 1)
-                                    <div ng-if="order.order_status == 0">
-                                        <input type="hidden" name="_method" value="put">
-                                        <input type="hidden" id="bill_retailer" name="bill_retailer"
-                                            value="{{ $a->address_retailer }}">
-                                        <input type="hidden" id="bill_address" value="{{ $a->address_id }}">
-                                        <div class="mb-3">
-                                            <label for="billCountry">Country</label>
-                                            <select id="billCountry" name="country" type="text"
-                                                class="form-select form-select-sm" value="{{ $a->address_country }}">
-                                                @foreach ($locations as $l)
-                                                    <option value="{{ $l->location_id }}"
-                                                        {{ $l->location_id == $a->address_country ? 'selected' : '' }}>
-                                                        {{ $l->location_name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
+                                    <div class="card mb-3">
+                                        <div class="card-body small">
+                                            <h6 class="card-title text-uppercase d-flex">
+                                                <span class="me-auto">Billing Address</span>
+                                                {{-- <a href="" data-target="#billBox"
+                                                    class="address-toggle-btn bi bi-dash-square link-secondary small"
+                                                    ng-if="order.order_status == 0"></a> --}}
+                                            </h6>
+                                            <div id="billBox" ng-if="order.order_status == 0">
+                                                <input type="hidden" id="bill_address" value="{{ $a->address_id }}">
+                                                <div class="row">
+                                                    <div class="col-6">
+                                                        <div class="mb-3">
+                                                            <label for="billCountry">Country<b
+                                                                    class="text-danger">&ast;</b></label>
+                                                            <input id="billCountry" name="bill_country" type="text"
+                                                                class="address-input form-control form-control-sm"
+                                                                value="{{ $a->address_country }}" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <div class="mb-3">
+                                                            <label for="billCity">City<b
+                                                                    class="text-danger">&ast;</b></label>
+                                                            <input id="billCity" name="bill_city" type="text"
+                                                                class="address-input form-control form-control-sm"
+                                                                value="{{ $a->address_city }}" maxlength="120" required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-6">
+                                                        <div class="mb-3">
+                                                            <label for="billZip">Zip/Postal Code</label>
+                                                            <input id="billZip" name="bill_zip" type="text"
+                                                                class="address-input form-control form-control-sm"
+                                                                value="{{ $a->address_zip }}" maxlength="24">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <div class="mb-3">
+                                                            <label for="billPhone">Contact Number<b
+                                                                    class="text-danger">&ast;</b></label>
+                                                            <input id="billPhone" name="bill_phone" type="tel"
+                                                                class="address-input form-control form-control-sm"
+                                                                value="{{ $a->address_phone }}" maxlength="24" required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="billLine1">Address Line 1<b
+                                                            class="text-danger">&ast;</b></label>
+                                                    <input id="billLine1" name="bill_line1" type="text"
+                                                        class="address-input form-control form-control-sm"
+                                                        value="{{ $a->address_line1 }}" maxlength="255" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="billLine2">Address Line 2</label>
+                                                    <input id="billLine2" name="bill_line2" type="text"
+                                                        class="address-input form-control form-control-sm"
+                                                        value="{{ $a->address_line2 }}" maxlength="255">
+                                                </div>
+                                                <div>
+                                                    <label for="billNote">Billing Note</label>
+                                                    <input id="billNote" name="bill_note" type="text"
+                                                        class="address-input form-control form-control-sm"
+                                                        value="{{ $a->address_note }}" maxlength="1024">
+                                                </div>
+                                            </div>
+                                            <div ng-if="order.order_status >= 2" class="small fw-bold">
+                                                <p class="m-0">{{ $a->address_line2 }}</p>
+                                                <p class="m-0">{{ $a->address_line1 }}</p>
+                                                <p class="m-0">{{ $a->address_country }},{{ $a->address_city }}</p>
+                                                <p class="m-0">Postal/Zip Code: {{ $a->address_zip }}</p>
+                                                <p class="m-0">Contact Number: {{ $a->address_phone }}</p>
+                                                <p class="m-0">Billing Note:<br>{{ $a->address_note }}</p>
+                                            </div>
                                         </div>
-                                        <div class="mb-3">
-                                            <label for="billProvince">Province</label>
-                                            <input id="billProvince" name="province" type="text"
-                                                class="form-control form-control-sm" value="{{ $a->address_province }}"
-                                                maxlength="120">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="billCity">City<b class="text-danger">&ast;</b></label>
-                                            <input id="billCity" name="city" type="text"
-                                                class="form-control form-control-sm" value="{{ $a->address_city }}"
-                                                maxlength="120" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="billZip">Zip Code</label>
-                                            <input id="billZip" name="zip" type="text"
-                                                class="form-control form-control-sm" value="{{ $a->address_zip }}"
-                                                maxlength="24">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="billPhone">Contact Number<b class="text-danger">&ast;</b></label>
-                                            <input id="billPhone" name="phone" type="text"
-                                                class="form-control form-control-sm" value="{{ $a->address_phone }}"
-                                                maxlength="24" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="billLine1">Address Line 1<b class="text-danger">&ast;</b></label>
-                                            <input id="billLine1" name="line1" type="text"
-                                                class="form-control form-control-sm" value="{{ $a->address_line1 }}"
-                                                maxlength="24" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="billLine2">Address Line 2</label>
-                                            <input id="billLine2" name="line2" type="text"
-                                                class="form-control form-control-sm" value="{{ $a->address_line1 }}"
-                                                maxlength="24" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="billNote">Note</label>
-                                            <input id="billNote" name="note" type="text"
-                                                class="form-control form-control-sm" value="{{ $a->address_note }}"
-                                                maxlength="1024">
+                                    </div>
+                                @elseif($a->address_type == 2)
+                                    <div class="card mb-3">
+                                        <div class="card-body small">
+                                            <h6 class="card-title text-uppercase d-flex">
+                                                <span class="me-auto">Shipping Address</span>
+                                                {{-- <a href="" data-target="#shipBox"
+                                                    class="address-toggle-btn bi bi-dash-square link-secondary small"
+                                                    ng-if="order.order_status == 0"></a> --}}
+                                            </h6>
+                                            <div id="shipBox" ng-if="order.order_status == 0">
+                                                <input type="hidden" id="ship_address" value="{{ $a->address_id }}">
+                                                <div class="row">
+                                                    <div class="col-6">
+                                                        <div class="mb-3">
+                                                            <label for="shipCountry">Country<b
+                                                                    class="text-danger">&ast;</b></label>
+                                                            <input id="shipCountry" name="ship_country" type="text"
+                                                                class="address-input form-control form-control-sm"
+                                                                value="{{ $a->address_country }}" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <div class="mb-3">
+                                                            <label for="shipCity">City<b
+                                                                    class="text-danger">&ast;</b></label>
+                                                            <input id="shipCity" name="ship_city" type="text"
+                                                                class="address-input form-control form-control-sm"
+                                                                value="{{ $a->address_city }}" maxlength="120" required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-6">
+                                                        <div class="mb-3">
+                                                            <label for="shipZip">Zip/Postal Code</label>
+                                                            <input id="shipZip" name="ship_zip" type="text"
+                                                                class="address-input form-control form-control-sm"
+                                                                value="{{ $a->address_zip }}" maxlength="24">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <div class="mb-3">
+                                                            <label for="shipPhone">Contact Number<b
+                                                                    class="text-danger">&ast;</b></label>
+                                                            <input id="shipPhone" name="ship_phone" type="tel"
+                                                                class="address-input form-control form-control-sm"
+                                                                value="{{ $a->address_phone }}" maxlength="24" required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="shipLine1">Address Line 1<b
+                                                            class="text-danger">&ast;</b></label>
+                                                    <input id="shipLine1" name="ship_line1" type="text"
+                                                        class="address-input form-control form-control-sm"
+                                                        value="{{ $a->address_line1 }}" maxlength="255" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="shipLine2">Address Line 2</label>
+                                                    <input id="shipLine2" name="ship_line2" type="text"
+                                                        class="address-input form-control form-control-sm"
+                                                        value="{{ $a->address_line2 }}" maxlength="255">
+                                                </div>
+                                                <div>
+                                                    <label for="shipNote">Shipping Note</label>
+                                                    <input id="shipNote" name="ship_note" type="text"
+                                                        class="address-input form-control form-control-sm"
+                                                        value="{{ $a->address_note }}" maxlength="1024">
+                                                </div>
+                                            </div>
+                                            <div ng-if="order.order_status >= 2" class="small fw-bold">
+                                                <p class="m-0">{{ $a->address_line1 }}</p>
+                                                <p class="m-0">{{ $a->address_line2 }}</p>
+                                                <p class="m-0">{{ $a->address_country }},{{ $a->address_city }}</p>
+                                                <p class="m-0">Postal/Zip Code: {{ $a->address_zip }}</p>
+                                                <p class="m-0">Contact Number: {{ $a->address_phone }}</p>
+                                                <p class="m-0">Billing Note:<br>{{ $a->address_note }}</p>
+                                            </div>
                                         </div>
                                     </div>
                                 @endif
                             @endforeach
-                            <div ng-if="order.order_status >= 2">
-                                @foreach ($addresses as $a)
-                                    @if ($a->address_type == 1)
-                                        <h6 class="small">{{ $a->address_province }},{{ $a->address_city }},
-                                            {{ $a->address_zip }} - {{ $a->address_line1 }}, {{ $a->address_line2 }}
-                                        </h6>
-                                        <h6 class="small">{{ $a->address_phone }}</h6>
-                                    @endif
-                                @endforeach
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="col-12">
-                            <h6>
-                                <span class="text-uppercase">Shipping Address</span>
-                            </h6>
-                            @foreach ($addresses as $a)
-                                @if ($a->address_type == 2)
-                                    <div ng-if="order.order_status == 0">
-                                        <input type="hidden" name="_method" value="put">
-                                        <input type="hidden" id="shipp_retailer" value="{{ $a->address_retailer }}">
-                                        <input type="hidden" id="shipp_address" value="{{ $a->address_id }}">
-                                        <div class="mb-3">
-                                            <label for="shippingCountry">Country</label>
-                                            <select id="shippingCountry" name="country" type="text"
-                                                class="form-select form-select-sm" value="{{ $a->address_country }}">
-                                                @foreach ($locations as $l)
-                                                    <option value="{{ $l->location_id }}"
-                                                        {{ $l->location_id == $a->address_country ? 'selected' : '' }}>
-                                                        {{ $l->location_name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="shhingProvince">Province</label>
-                                            <input id="shhingProvince" name="province" type="text"
-                                                class="form-control form-control-sm" value="{{ $a->address_province }}"
-                                                maxlength="120">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="shippinfCity">City<b class="text-danger">&ast;</b></label>
-                                            <input id="shippinfCity" name="city" type="text"
-                                                class="form-control form-control-sm" value="{{ $a->address_city }}"
-                                                maxlength="120" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="shippingZip">Zip Code</label>
-                                            <input id="shippingZip" name="zip" type="text"
-                                                class="form-control form-control-sm" value="{{ $a->address_zip }}"
-                                                maxlength="24">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="shippingPhone">Contact Number<b
-                                                    class="text-danger">&ast;</b></label>
-                                            <input id="shippingPhone" name="phone" type="text"
-                                                class="form-control form-control-sm" value="{{ $a->address_phone }}"
-                                                maxlength="24" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="shippingLine1">Address Line 1<b
-                                                    class="text-danger">&ast;</b></label>
-                                            <input id="shippingLine1" name="line1" type="text"
-                                                class="form-control form-control-sm" value="{{ $a->address_line1 }}"
-                                                maxlength="24" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="shippingLine2">Address Line 2</label>
-                                            <input id="shippingLine2" name="line2" type="text"
-                                                class="form-control form-control-sm" value="{{ $a->address_line1 }}"
-                                                maxlength="24" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="shippingNote">Note</label>
-                                            <input id="shippingNote" name="note" type="text"
-                                                class="form-control form-control-sm" value="{{ $a->address_note }}"
-                                                maxlength="1024">
-                                        </div>
-                                    </div>
-                                @endif
-                            @endforeach
 
-                            <div ng-if="order.order_status >= 2">
-                                @foreach ($addresses as $a)
-                                    @if ($a->address_type == 2)
-                                        <h6 class="small">{{ $a->address_province }},{{ $a->address_city }},
-                                            {{ $a->address_zip }} - {{ $a->address_line1 }}, {{ $a->address_line2 }}
-                                        </h6>
-                                        <h6 class="small">{{ $a->address_phone }}</h6>
-                                    @endif
-                                @endforeach
-                            </div>
+                            <table class="table small">
+                                <tbody>
+                                    <tr ng-if="+order.order_discount">
+                                        <td class="col-fit">Subtotal</td>
+                                        <td class="text-end font-monospace">
+                                            <span ng-bind="order.currency_code"></span>
+                                            <span ng-bind="fn.sepNumber(order.order_subtotal)"></span>
+                                        </td>
+                                    </tr>
+                                    <tr ng-if="+order.order_discount">
+                                        <td class="col-fit">Discount</td>
+                                        <td class="text-end font-monospace">
+                                            <span ng-bind="order.currency_code"></span>
+                                            <span ng-bind="fn.sepNumber(order.order_discount)"></span>
+                                        </td>
+                                    </tr>
+                                    <tr class="fw-bold">
+                                        <td class="col-fit">Total</td>
+                                        <td class="text-end font-monospace">
+                                            <span ng-bind="order.currency_code"></span>
+                                            <span ng-bind="fn.sepNumber(order.order_total)"></span>
+                                        </td>
+                                    </tr>
+                                    <tr class="text-secondary">
+                                        <td class="col-fit">Adv. Payment 30%</td>
+                                        <td class="text-end font-monospace">
+                                            <span ng-bind="order.currency_code"></span>
+                                            <span ng-bind="fn.sepNumber(order.order_total * 0.3)"></span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <h6 class="font-monospace small">Qty: <span ng-bind="orderQty"></span></h6>
 
-                        </div>
-                        <hr>
-                        <table class="table small">
-                            <tbody>
-                                <tr ng-if="+order.order_discount">
-                                    <td class="col-fit">Subtotal</td>
-                                    <td class="text-end font-monospace">
-                                        <span ng-bind="order.currency_code"></span>
-                                        <span ng-bind="fn.sepNumber(order.order_subtotal)"></span>
-                                    </td>
-                                </tr>
-                                <tr ng-if="+order.order_discount">
-                                    <td class="col-fit">Discount</td>
-                                    <td class="text-end font-monospace">
-                                        <span ng-bind="order.currency_code"></span>
-                                        <span ng-bind="fn.sepNumber(order.order_discount)"></span>
-                                    </td>
-                                </tr>
-                                <tr class="fw-bold">
-                                    <td class="col-fit">Total</td>
-                                    <td class="text-end font-monospace">
-                                        <span ng-bind="order.currency_code"></span>
-                                        <span ng-bind="fn.sepNumber(order.order_total)"></span>
-                                    </td>
-                                </tr>
-                                <tr class="text-secondary">
-                                    <td class="col-fit">Adv. Payment 30%</td>
-                                    <td class="text-end font-monospace">
-                                        <span ng-bind="order.currency_code"></span>
-                                        <span ng-bind="fn.sepNumber(order.order_total * 0.3)"></span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <h6 class="font-monospace small">Qty: <span ng-bind="orderQty"></span></h6>
-
-                        <p class="text-danger small fw-bold" ng-if="order.order_total < 2000">
-                            <i class="bi bi-info-circle me-1"></i><span>Minimum order amount EUR 2000</span>
-                        </p>
-                        <div class="mt-3">
-                            <label for="orderNote">Note</label>
-                            <textarea id="orderNote" class="form-control form-control-sm" rows="2" ng-readonly="order.order_status > 0"
-                                ng-bind="order.order_note"></textarea>
-                        </div>
-                        <div ng-if="order.order_status == 0" class="mt-4">
-                            <div class="d-flex">
-                                <button class="btn btn-outline-success rounded-pill px-3 btn-sm me-auto"
-                                    ng-click="orderStatus(2)"
-                                    ng-disabled="order.order_total < 2000 || !minQty() || statusSubmit">Place
-                                    Order</button>
-                                <button class="btn btn-outline-danger rounded-pill px-3 btn-sm" ng-disabled="statusSubmit"
-                                    ng-click="orderStatus(1)">Cancel</button>
+                            <p class="text-danger small fw-bold" ng-if="order.order_total < 2000">
+                                <i class="bi bi-info-circle me-1"></i><span>Minimum order amount EUR 2000</span>
+                            </p>
+                            <div class="mt-3">
+                                <label for="orderNote">Note</label>
+                                <textarea id="orderNote" class="form-control form-control-sm" rows="2" ng-value="order.order_note"
+                                    ng-if="order.order_status == 0"></textarea>
+                                <p ng-bind="order.order_note" ng-if="order.order_status > 0" class="small fw-bold"></p>
                             </div>
-                        </div>
+                            <div ng-if="order.order_status == 0" class="mt-4">
+                                <div class="d-flex">
+                                    <button class="btn btn-outline-success rounded-pill px-3 btn-sm me-auto"
+                                        ng-click="orderStatus(2)"
+                                        ng-disabled="order.order_total < 2000 || !minQty() || statusSubmit">Place
+                                        Order</button>
+                                    <button class="btn btn-outline-danger rounded-pill px-3 btn-sm"
+                                        ng-disabled="statusSubmit" ng-click="orderStatus(1)">Cancel</button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -336,7 +343,7 @@
                 $interpolateProvider.endSymbol('%>');
             });
 
-        app.controller('ngCtrl', function($scope) {
+        app.controller('ngCtrl', function($scope, $timeout) {
             $scope.mediaPath = 'https://dash.sofieamoura.com/public/media/product';
             $scope.fn = NgFunctions;
             $scope.statusObject = {
@@ -348,6 +355,7 @@
             };
             $scope.statusSubmit = false;
             $scope.qtyUpdate = false;
+            $scope.min_qty = 6;
             $scope.focusedQty = 0;
             $scope.orderDisc = 0;
             $scope.orderQty = 0;
@@ -415,48 +423,51 @@
             }
 
             $scope.orderStatus = function(status) {
+                if (status == 2 && !$('#orderForm').valid()) return;
                 $scope.statusSubmit = true;
-                $.post('/orders/update_status', {
+
+                var request = {
                     order: $scope.order.order_id,
-                    note: () => $('#orderNote').val(),
-                    bill_retailer: $('#bill_retailer').val(),
-                    bill_address: $('#bill_address').val(),
-                    billCountry: $('#billCountry').val(),
-                    billProvince: $('#billProvince').val(),
-                    billCity: $('#billCity').val(),
-                    billZip: $('#billZip').val(),
-                    billPhone: $('#billPhone').val(),
-                    billLine1: $('#billLine1').val(),
-                    billLine2: $('#billLine2').val(),
-                    billNote: $('#billNote').val(),
-                    shipp_retailer: $('#shipp_retailer').val(),
-                    shipp_address: $('#shipp_address').val(),
-                    shippingCountry: $('#shippingCountry').val(),
-                    shhingProvince: $('#shhingProvince').val(),
-                    shippinfCity: $('#shippinfCity').val(),
-                    shippingZip: $('#shippingZip').val(),
-                    shippingPhone: $('#shippingPhone').val(),
-                    shippingLine1: $('#shippingLine1').val(),
-                    shippingLine2: $('#shippingLine2').val(),
-                    shippingNote: $('#shippingNote').val(),
+                    retailer: $scope.order.order_retailer,
+                    note: $('#orderNote').val(),
                     status: status,
                     _token: '{{ csrf_token() }}',
-                }, function(response) {
+                };
+
+                if (status == 2) {
+                    request.bill_address = $('#bill_address').val();
+                    request.ship_address = $('#ship_address').val();
+                    $('input.address-input').each(function() {
+                        request[$(this).attr('name')] = $.trim($(this).val());
+                    });
+                }
+
+                $.post('/orders/update_status', request, function(response) {
                     scope.$apply(() => {
                         scope.statusSubmit = false;
                         if (response.status) {
                             scope.order = response.data;
-                            $('#Plec').style.display === "none";
                         } else toastr.error(response.message);
                     });
                 }, 'json');
             }
 
             $scope.minQty = function() {
-                return Math.min(...Object.values(scope.parsedProducts).map(e => e.qty)) >= 6;
+                return Math.min(...Object.values(scope.parsedProducts).map(e => e.qty)) >= $scope.min_qty;
             }
 
             $scope.parseProducts();
+
+            $timeout(function() {
+                $('#orderForm').validate();
+                // $('.address-toggle-btn').off().on('click', function(e) {
+                //     e.preventDefault();
+                //     var target = $(this).data('target');
+                //     console.log(target);
+                //     $(target).slideToggle();
+                //     $(this).toggleClass('bi-dash-square bi-plus-square');
+                // });
+            }, 250);
             scope = $scope;
         });
     </script>

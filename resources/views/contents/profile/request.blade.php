@@ -4,7 +4,7 @@
             <img src="/assets/img/logo.png" alt="Sofie Amoura" draggable="false" width="200">
         </h3>
 
-        <p>Your request has been successfully submitted and being processed<br>
-            You will receive an account activation email soon</p>
+        <p>Votre demande a été soumise avec succès et est en cours de traitement<br>
+            Vous recevrez bientôt un e-mail d'activation de compte</p>
     </div>
 </x-guest-layout>

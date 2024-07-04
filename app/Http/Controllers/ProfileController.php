@@ -118,7 +118,7 @@ class ProfileController extends Controller
 
         $result = Retailer_address::submit([
             'address_country'   => $request->country,
-            'address_province'  => $request->province,
+            // 'address_province'  => $request->province,
             'address_city'      => $request->city,
             'address_zip'       => $request->zip,
             'address_phone'     => $request->phone,
@@ -127,6 +127,6 @@ class ProfileController extends Controller
             'address_note'      => $request->note,
         ], $request->address);
 
-        echo json_encode(['status' => boolval($result)]);
+        echo json_encode(['status' => $result]);
     }
 }

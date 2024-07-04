@@ -44,8 +44,7 @@ class Retailer extends Authenticatable
 
     static function fetch($id = 0, $params = null)
     {
-        $retailers = self::join('locations', 'retailer_country', 'location_id')
-            ->join('currencies', 'retailer_currency', 'currency_id');
+        $retailers = self::join('currencies', 'retailer_currency', 'currency_id');
 
         if ($params) $retailers->where($params);
         if ($id) $retailers->where('retailer_id', $id);
@@ -55,9 +54,9 @@ class Retailer extends Authenticatable
 
     static function submit($param, $id = null)
     {
-        if ($id) self::where('retailer_id', $id)->update($param) ? $id : false;
+        if ($id) return self::where('retailer_id', $id)->update($param) ? $id : false;
         $status = self::create($param);
-        return $status ? $status->id : false;
+        return $status ? $status->retailer_id : false;
     }
 
     public function getEmailForPasswordReset()
